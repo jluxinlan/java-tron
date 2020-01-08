@@ -27,7 +27,7 @@ import stest.tron.wallet.common.client.Parameter.CommonConstant;
 import stest.tron.wallet.common.client.utils.PublicMethed;
 
 @Slf4j
-public class TriggerConstant005 {
+public class TriggerConstant0055 {
 
   private final String testNetAccountKey = Configuration.getByPath("testng.conf")
       .getString("foundationAccount.key2");
@@ -97,7 +97,7 @@ public class TriggerConstant005 {
 
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a payable function with ABI")
+  @Test(enabled = false, description = "TriggerConstantContract a payable function with ABI")
   public void testTriggerConstantContract() {
     Assert.assertTrue(PublicMethed
         .sendcoin(contractExcAddress, 1000000000L, testNetAccountAddress, testNetAccountKey,
@@ -143,9 +143,9 @@ public class TriggerConstant005 {
         .println("Message = " + transactionExtention.getResult().getMessage().toStringUtf8());
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
-        containsString("SUCCESS"));
-//    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+        containsString("CONTRACT_EXE_ERROR"));
+    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
 
     TransactionExtention transactionExtention1 = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddress,
@@ -156,9 +156,9 @@ public class TriggerConstant005 {
         .println("Message = " + transactionExtention1.getResult().getMessage().toStringUtf8());
 
     Assert.assertThat(transactionExtention1.getResult().getCode().toString(),
-        containsString("SUCCESS"));
-//    Assert.assertThat(transactionExtention1.getResult().getMessage().toStringUtf8(),
-//        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+        containsString("CONTRACT_EXE_ERROR"));
+    Assert.assertThat(transactionExtention1.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
 
     TransactionExtention transactionExtention2 = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddress,
@@ -169,9 +169,9 @@ public class TriggerConstant005 {
         .println("Message = " + transactionExtention2.getResult().getMessage().toStringUtf8());
 
     Assert.assertThat(transactionExtention2.getResult().getCode().toString(),
-        containsString("SUCCESS"));
-//    Assert.assertThat(transactionExtention2.getResult().getMessage().toStringUtf8(),
-//        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+        containsString("CONTRACT_EXE_ERROR"));
+    Assert.assertThat(transactionExtention2.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
   }
 
 

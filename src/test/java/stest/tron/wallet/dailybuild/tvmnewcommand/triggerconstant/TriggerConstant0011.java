@@ -31,7 +31,7 @@ import stest.tron.wallet.common.client.Parameter.CommonConstant;
 import stest.tron.wallet.common.client.utils.PublicMethed;
 
 @Slf4j
-public class TriggerConstant001 {
+public class TriggerConstant0011 {
 
   private final String testNetAccountKey = Configuration.getByPath("testng.conf")
       .getString("foundationAccount.key2");
@@ -135,7 +135,7 @@ public class TriggerConstant001 {
     }
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a payable function without ABI")
+  @Test(enabled = false, description = "TriggerConstantContract a payable function without ABI")
   public void test01TriggerConstantContract() {
 
     String txid = "";
@@ -150,13 +150,13 @@ public class TriggerConstant001 {
 
     Assert
         .assertThat(transactionExtention.getResult().getCode().toString(),
-            containsString("SUCCESS"));
-//    Assert
-//        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+            containsString("CONTRACT_EXE_ERROR"));
+    Assert
+        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a payable function without ABI on solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a payable function without ABI on solidity")
   public void test01TriggerConstantContractOnSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressNoAbi,
@@ -168,13 +168,13 @@ public class TriggerConstant001 {
 
     Assert
         .assertThat(transactionExtention.getResult().getCode().toString(),
-            containsString("SUCCESS"));
-//    Assert
-//        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+            containsString("CONTRACT_EXE_ERROR"));
+    Assert
+        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a payable function without ABI on real solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a payable function without ABI on real solidity")
   public void test01TriggerConstantContractOnRealSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressNoAbi,
@@ -186,13 +186,13 @@ public class TriggerConstant001 {
 
     Assert
         .assertThat(transactionExtention.getResult().getCode().toString(),
-            containsString("SUCCESS"));
-//    Assert
-//        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+            containsString("CONTRACT_EXE_ERROR"));
+    Assert
+        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a non-payable function without ABI")
+  @Test(enabled = false, description = "TriggerConstantContract a non-payable function without ABI")
   public void test02TriggerConstantContract() {
 
     TransactionExtention transactionExtention = PublicMethed
@@ -205,13 +205,13 @@ public class TriggerConstant001 {
 
     Assert
         .assertThat(transactionExtention.getResult().getCode().toString(),
-            containsString("SUCCESS"));
-//    Assert
-//        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+            containsString("CONTRACT_EXE_ERROR"));
+    Assert
+        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a non-payable function without ABI on solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a non-payable function without ABI on solidity")
   public void test02TriggerConstantContractOnSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressNoAbi,
@@ -221,15 +221,15 @@ public class TriggerConstant001 {
     System.out
         .println("Message = " + transactionExtention.getResult().getMessage().toStringUtf8());
 
-//    Assert
-//        .assertThat(transactionExtention.getResult().getCode().toString(),
-//            containsString("SUCCESS"));
-//    Assert
-//        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+    Assert
+        .assertThat(transactionExtention.getResult().getCode().toString(),
+            containsString("CONTRACT_EXE_ERROR"));
+    Assert
+        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a non-payable function without ABI on real solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a non-payable function without ABI on real solidity")
   public void test02TriggerConstantContractOnRealSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressNoAbi,
@@ -241,13 +241,13 @@ public class TriggerConstant001 {
 
     Assert
         .assertThat(transactionExtention.getResult().getCode().toString(),
-            containsString("SUCCESS"));
-//    Assert
-//        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+            containsString("CONTRACT_EXE_ERROR"));
+    Assert
+        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a view function without ABI")
+  @Test(enabled = false, description = "TriggerConstantContract a view function without ABI")
   public void test03TriggerConstantContract() {
 
 
@@ -269,7 +269,7 @@ public class TriggerConstant001 {
             .toHexString(result))));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a view function without ABI on solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a view function without ABI on solidity")
   public void test03TriggerConstantContractOnSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressNoAbi,
@@ -289,7 +289,7 @@ public class TriggerConstant001 {
             .toHexString(result))));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a view function without ABI on real solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a view function without ABI on real solidity")
   public void test03TriggerConstantContractOnRealSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressNoAbi,
@@ -309,7 +309,7 @@ public class TriggerConstant001 {
             .toHexString(result))));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a pure function without ABI")
+  @Test(enabled = false, description = "TriggerConstantContract a pure function without ABI")
   public void test04TriggerConstantContract() {
 
 
@@ -334,7 +334,7 @@ public class TriggerConstant001 {
   }
 
 
-  @Test(enabled = true, description = "TriggerConstantContract a pure function without ABI on solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a pure function without ABI on solidity")
   public void test04TriggerConstantContractOnSolidity() {
 
 
@@ -358,7 +358,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a pure function without ABI on real solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a pure function without ABI on real solidity")
   public void test04TriggerConstantContractOnRealSolidity() {
 
 
@@ -382,7 +382,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a payable function with ABI")
+  @Test(enabled = false, description = "TriggerConstantContract a payable function with ABI")
   public void test05TriggerConstantContract() {
 
     TransactionExtention transactionExtention = PublicMethed
@@ -394,15 +394,15 @@ public class TriggerConstant001 {
         .println("Message = " + transactionExtention.getResult().getMessage().toStringUtf8());
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
-        containsString("SUCCESS"));
-//    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+        containsString("CONTRACT_EXE_ERROR"));
+    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
     PublicMethed.waitProduceNextBlock(blockingStubFull);
 
 
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a payable function with ABI on solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a payable function with ABI on solidity")
   public void test05TriggerConstantContractOnSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressNoAbi,
@@ -413,13 +413,13 @@ public class TriggerConstant001 {
         .println("Message = " + transactionExtention.getResult().getMessage().toStringUtf8());
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
-        containsString("SUCCESS"));
-//    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+        containsString("CONTRACT_EXE_ERROR"));
+    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
     PublicMethed.waitProduceNextBlock(blockingStubFull);
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a payable function with ABI on real solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a payable function with ABI on real solidity")
   public void test05TriggerConstantContractOnRealSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressNoAbi,
@@ -430,13 +430,13 @@ public class TriggerConstant001 {
         .println("Message = " + transactionExtention.getResult().getMessage().toStringUtf8());
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
-        containsString("SUCCESS"));
-//    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+        containsString("CONTRACT_EXE_ERROR"));
+    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
     PublicMethed.waitProduceNextBlock(blockingStubFull);
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a non-payable function with ABI")
+  @Test(enabled = false, description = "TriggerConstantContract a non-payable function with ABI")
   public void test06TriggerConstantContract() {
 
 
@@ -448,16 +448,16 @@ public class TriggerConstant001 {
     System.out
         .println("Message = " + transactionExtention.getResult().getMessage().toStringUtf8());
 
-//    Assert.assertThat(transactionExtention.getResult().getCode().toString(),
-//        containsString("SUCCESS"));
-//    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+    Assert.assertThat(transactionExtention.getResult().getCode().toString(),
+        containsString("CONTRACT_EXE_ERROR"));
+    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
     PublicMethed.waitProduceNextBlock(blockingStubFull);
 
 
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a non-payable function with ABI on solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a non-payable function with ABI on solidity")
   public void test06TriggerConstantContractOnSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressWithAbi,
@@ -468,13 +468,13 @@ public class TriggerConstant001 {
         .println("Message = " + transactionExtention.getResult().getMessage().toStringUtf8());
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
-        containsString("SUCCESS"));
-//    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+        containsString("CONTRACT_EXE_ERROR"));
+    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
     PublicMethed.waitProduceNextBlock(blockingStubFull);
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a non-payable function with ABI on real solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a non-payable function with ABI on real solidity")
   public void test06TriggerConstantContractOnRealSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressWithAbi,
@@ -485,13 +485,13 @@ public class TriggerConstant001 {
         .println("Message = " + transactionExtention.getResult().getMessage().toStringUtf8());
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
-        containsString("SUCCESS"));
-//    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+        containsString("CONTRACT_EXE_ERROR"));
+    Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));
     PublicMethed.waitProduceNextBlock(blockingStubFull);
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a view function with ABI")
+  @Test(enabled = false, description = "TriggerConstantContract a view function with ABI")
   public void test07TriggerConstantContract() {
 
     TransactionExtention transactionExtention = PublicMethed
@@ -514,7 +514,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a view function with ABI on solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a view function with ABI on solidity")
   public void test07TriggerConstantContractOnSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressWithAbi,
@@ -534,7 +534,7 @@ public class TriggerConstant001 {
             .toHexString(result))));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a view function with ABI on real solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a view function with ABI on real solidity")
   public void test07TriggerConstantContractOnRealSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressWithAbi,
@@ -554,7 +554,7 @@ public class TriggerConstant001 {
             .toHexString(result))));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a pure function with ABI")
+  @Test(enabled = false, description = "TriggerConstantContract a pure function with ABI")
   public void test08TriggerConstantContract() {
 
 
@@ -578,7 +578,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a pure function with ABI on solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a pure function with ABI on solidity")
   public void test08TriggerConstantContractOnSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressWithAbi,
@@ -598,7 +598,7 @@ public class TriggerConstant001 {
             .toHexString(result))));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a pure function with ABI on real solidity")
+  @Test(enabled = false, description = "TriggerConstantContract a pure function with ABI on real solidity")
   public void test08TriggerConstantContractOnRealSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressWithAbi,
@@ -618,7 +618,7 @@ public class TriggerConstant001 {
             .toHexString(result))));
   }
 
-  @Test(enabled = true, description = "TriggerContract a payable function without ABI")
+  @Test(enabled = false, description = "TriggerContract a payable function without ABI")
   public void test09TriggerContract() {
     Account info;
 
@@ -679,7 +679,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerContract a non-payable function without ABI")
+  @Test(enabled = false, description = "TriggerContract a non-payable function without ABI")
   public void test10TriggerContract() {
     Account info;
 
@@ -740,7 +740,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerContract a view function without ABI")
+  @Test(enabled = false, description = "TriggerContract a view function without ABI")
   public void test11TriggerContract() {
 
     Account info;
@@ -802,7 +802,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerContract a pure function without ABI")
+  @Test(enabled = false, description = "TriggerContract a pure function without ABI")
   public void test12TriggerContract() {
 
     Account info;
@@ -864,7 +864,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerContract a pure function with ABI")
+  @Test(enabled = false, description = "TriggerContract a pure function with ABI")
   public void test18TriggerContract() {
 
     TransactionExtention transactionExtention = PublicMethed
@@ -886,7 +886,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerContract a payable function with ABI")
+  @Test(enabled = false, description = "TriggerContract a payable function with ABI")
   public void test19TriggerContract() {
 
     Account info;
@@ -946,7 +946,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerContract a non-payable function with ABI")
+  @Test(enabled = false, description = "TriggerContract a non-payable function with ABI")
   public void test20TriggerContract() {
     Account info;
 
@@ -1005,7 +1005,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerContract a view function with ABI")
+  @Test(enabled = false, description = "TriggerContract a view function with ABI")
   public void test21TriggerConstantContract() {
 
     TransactionExtention transactionExtention = PublicMethed
@@ -1027,7 +1027,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerContract a view function with ABI on solidity")
+  @Test(enabled = false, description = "TriggerContract a view function with ABI on solidity")
   public void test21TriggerConstantContractOnSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressWithAbi,
@@ -1047,7 +1047,7 @@ public class TriggerConstant001 {
             .toHexString(result))));
   }
 
-  @Test(enabled = true, description = "TriggerContract a view function with ABI on real solidity")
+  @Test(enabled = false, description = "TriggerContract a view function with ABI on real solidity")
   public void test21TriggerConstantContractOnRealSolidity() {
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtentionOnSolidity(contractAddressWithAbi,
@@ -1067,7 +1067,7 @@ public class TriggerConstant001 {
             .toHexString(result))));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a view method with ABI ,method has "
+  @Test(enabled = false, description = "TriggerConstantContract a view method with ABI ,method has "
       + "revert()")
   public void test24TriggerConstantContract() {
 
@@ -1095,7 +1095,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a view method with ABI ,method has "
+  @Test(enabled = false, description = "TriggerConstantContract a view method with ABI ,method has "
       + "revert() on solidity")
   public void test24TriggerConstantContractOnSolidity() {
     TransactionExtention transactionExtention = PublicMethed
@@ -1119,7 +1119,7 @@ public class TriggerConstant001 {
             containsString("REVERT opcode executed"));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a view method with ABI ,method has "
+  @Test(enabled = false, description = "TriggerConstantContract a view method with ABI ,method has "
       + "revert() on real solidity")
   public void test24TriggerConstantContractOnRealSolidity() {
     TransactionExtention transactionExtention = PublicMethed
@@ -1143,7 +1143,7 @@ public class TriggerConstant001 {
             containsString("REVERT opcode executed"));
   }
 
-  @Test(enabled = true, description = "TriggerContract a view method with ABI ,method has "
+  @Test(enabled = false, description = "TriggerContract a view method with ABI ,method has "
       + "revert()")
   public void test25TriggerConstantContract() {
 
@@ -1165,7 +1165,7 @@ public class TriggerConstant001 {
         containsString("REVERT opcode executed"));
   }
 
-  @Test(enabled = true, description = "TriggerContract a view method with ABI ,method has "
+  @Test(enabled = false, description = "TriggerContract a view method with ABI ,method has "
       + "revert() on solidity")
   public void test25TriggerConstantContractOnSolidity() {
     TransactionExtention transactionExtention = PublicMethed
@@ -1186,7 +1186,7 @@ public class TriggerConstant001 {
         containsString("REVERT opcode executed"));
   }
 
-  @Test(enabled = true, description = "TriggerContract a view method with ABI ,method has "
+  @Test(enabled = false, description = "TriggerContract a view method with ABI ,method has "
       + "revert() on real solidity")
   public void test25TriggerConstantContractOnRealSolidity() {
     TransactionExtention transactionExtention = PublicMethed
@@ -1207,7 +1207,7 @@ public class TriggerConstant001 {
         containsString("REVERT opcode executed"));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a view method without ABI,method has"
+  @Test(enabled = false, description = "TriggerConstantContract a view method without ABI,method has"
       + "revert()")
   public void testTriggerConstantContract() {
 
@@ -1235,7 +1235,7 @@ public class TriggerConstant001 {
 
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a view method without ABI,method has"
+  @Test(enabled = false, description = "TriggerConstantContract a view method without ABI,method has"
       + "revert() on solidity")
   public void testTriggerConstantContractOnSolidity() {
     TransactionExtention transactionExtention = PublicMethed
@@ -1259,7 +1259,7 @@ public class TriggerConstant001 {
             containsString("REVERT opcode executed"));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a view method without ABI,method has"
+  @Test(enabled = false, description = "TriggerConstantContract a view method without ABI,method has"
       + "revert() on real solidity")
   public void testTriggerConstantContractOnRealSolidity() {
     TransactionExtention transactionExtention = PublicMethed

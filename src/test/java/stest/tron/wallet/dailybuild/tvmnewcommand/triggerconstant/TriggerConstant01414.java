@@ -30,7 +30,7 @@ import stest.tron.wallet.common.client.utils.Base58;
 import stest.tron.wallet.common.client.utils.PublicMethed;
 
 @Slf4j
-public class TriggerConstant014 {
+public class TriggerConstant01414 {
 
   private final String testNetAccountKey = Configuration.getByPath("testng.conf")
       .getString("foundationAccount.key2");
@@ -100,7 +100,7 @@ public class TriggerConstant014 {
     blockingStubRealSolidity = WalletSolidityGrpc.newBlockingStub(channelRealSolidity);
   }
 
-  @Test(enabled = true, description = "TriggerContract a non-constant function created by create2")
+  @Test(enabled = false, description = "TriggerContract a non-constant function created by create2")
   public void test01TriggerContract() {
     Assert.assertTrue(PublicMethed
         .sendcoin(contractExcAddress, 1000000000L, testNetAccountAddress, testNetAccountKey,
@@ -217,7 +217,7 @@ public class TriggerConstant014 {
     Assert.assertTrue(1 == returnnumber);
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a non-constant function "
+  @Test(enabled = false, description = "TriggerConstantContract a non-constant function "
       + "created by create2")
   public void test16TriggerConstantContract() {
 
@@ -233,13 +233,13 @@ public class TriggerConstant014 {
 
     Assert
         .assertThat(transactionExtention.getResult().getCode().toString(),
-            containsString("SUCCESS"));
-//    Assert
-//        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+            containsString("CONTRACT_EXE_ERROR"));
+    Assert
+        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a non-constant function "
+  @Test(enabled = false, description = "TriggerConstantContract a non-constant function "
       + "created by create2 on solidity")
   public void test16TriggerConstantContractOnSolidity() {
     String returnAddress = Base58.encode58Check(returnAddressBytes);
@@ -254,13 +254,13 @@ public class TriggerConstant014 {
 
     Assert
         .assertThat(transactionExtention.getResult().getCode().toString(),
-            containsString("SUCCESS"));
-//    Assert
-//        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+            containsString("CONTRACT_EXE_ERROR"));
+    Assert
+        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract a non-constant function "
+  @Test(enabled = false, description = "TriggerConstantContract a non-constant function "
       + "created by create2 on real solidity")
   public void test16TriggerConstantContractOnRealSolidity() {
     String returnAddress = Base58.encode58Check(returnAddressBytes);
@@ -275,10 +275,10 @@ public class TriggerConstant014 {
 
     Assert
         .assertThat(transactionExtention.getResult().getCode().toString(),
-            containsString("SUCCESS"));
-//    Assert
-//        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
-//            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+            containsString("CONTRACT_EXE_ERROR"));
+    Assert
+        .assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+            containsString("Attempt to call a state modifying opcode inside STATICCALL"));
   }
 
   /**
