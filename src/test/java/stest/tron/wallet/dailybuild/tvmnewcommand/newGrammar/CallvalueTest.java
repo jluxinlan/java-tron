@@ -54,7 +54,7 @@ public class CallvalueTest {
   /**
    * constructor.
    */
-  @BeforeClass(enabled = true)
+  @BeforeClass(enabled = false)
   public void beforeClass() {
 
     channelFull = ManagedChannelBuilder.forTarget(fullnode)
@@ -65,7 +65,7 @@ public class CallvalueTest {
     PublicMethed.printAddress(dev001Key);
   }
 
-  @Test(enabled = true, description = "Deploy contract")
+  @Test(enabled = false, description = "Deploy contract")
   public void test01DeployContract() {
     Assert.assertTrue(PublicMethed.sendcoin(dev001Address, 3147483647L, fromAddress,
         testKey002, blockingStubFull));
@@ -145,7 +145,7 @@ public class CallvalueTest {
     Assert.assertTrue(beforeNetUsed + netUsed >= afterNetUsed);
   }
 
-  @Test(enabled = true, description = "Trigger contract")
+  @Test(enabled = false, description = "Trigger contract")
   public void test02TriggerContract() {
     String methodStr = "check()";
     // 15

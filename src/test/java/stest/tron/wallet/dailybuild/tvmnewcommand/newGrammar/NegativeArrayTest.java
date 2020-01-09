@@ -55,7 +55,7 @@ public class NegativeArrayTest {
   /**
    * constructor.
    */
-  @BeforeClass(enabled = true)
+  @BeforeClass(enabled = false)
   public void beforeClass() {
 
     channelFull = ManagedChannelBuilder.forTarget(fullnode)
@@ -66,7 +66,7 @@ public class NegativeArrayTest {
     PublicMethed.printAddress(dev001Key);
   }
 
-  @Test(enabled = true, description = "Deploy contract")
+  @Test(enabled = false, description = "Deploy contract")
   public void test01DeployContract() {
     Assert.assertTrue(PublicMethed.sendcoin(dev001Address, 1000_000_000L, fromAddress,
         testKey002, blockingStubFull));
@@ -146,7 +146,7 @@ public class NegativeArrayTest {
     Assert.assertTrue(beforeNetUsed + netUsed >= afterNetUsed);
   }
 
-  @Test(enabled = true, description = "Trigger contract")
+  @Test(enabled = false, description = "Trigger contract")
   public void test02TriggerContract() {
     // get[2]
     String methodStr = "get(uint256)";

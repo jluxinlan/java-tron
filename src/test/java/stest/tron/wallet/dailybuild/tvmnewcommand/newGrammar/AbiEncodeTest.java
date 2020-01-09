@@ -54,7 +54,7 @@ public class AbiEncodeTest {
   /**
    * constructor.
    */
-  @BeforeClass(enabled = true)
+  @BeforeClass(enabled = false)
   public void beforeClass() {
 
     channelFull = ManagedChannelBuilder.forTarget(fullnode)
@@ -65,7 +65,7 @@ public class AbiEncodeTest {
     PublicMethed.printAddress(dev001Key);
   }
 
-  @Test(enabled = true, description = "Deploy contract")
+  @Test(enabled = false, description = "Deploy contract")
   public void test01DeployContract() {
     Assert.assertTrue(PublicMethed.sendcoin(dev001Address, 1000_000_000L, fromAddress,
         testKey002, blockingStubFull));
@@ -146,7 +146,7 @@ public class AbiEncodeTest {
     Assert.assertTrue(beforeNetUsed + netUsed >= afterNetUsed);
   }
 
-  @Test(enabled = true, description = "Trigger contract with ")
+  @Test(enabled = false, description = "Trigger contract with ")
   public void test02TriggerContract() {
     String methodStr = "h(int256[2][])";
     String argStr = "00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006300000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000008";
@@ -183,7 +183,7 @@ public class AbiEncodeTest {
         contractResult1);
   }
 
-  @Test(enabled = true, description = "Trigger contract with negative number")
+  @Test(enabled = false, description = "Trigger contract with negative number")
   public void test03TriggerContract() {
     String methodStr = "h(int256[2][])";
     String argStr = "00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000090000000000000000000000000000000000000000000000000000000000000042ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbe00000000000000000000000000000000000000000000000000000000000000b1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa8";

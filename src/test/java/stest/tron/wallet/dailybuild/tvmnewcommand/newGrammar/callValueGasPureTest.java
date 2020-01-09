@@ -56,7 +56,7 @@ public class callValueGasPureTest {
   /**
    * constructor.
    */
-  @BeforeClass(enabled = true)
+  @BeforeClass(enabled = false)
   public void beforeClass() {
 
     channelFull = ManagedChannelBuilder.forTarget(fullnode).usePlaintext(true).build();
@@ -65,7 +65,7 @@ public class callValueGasPureTest {
     PublicMethed.printAddress(testKey001);
   }
 
-  @Test(enabled = true, description = "call.value.gas be pure")
+  @Test(enabled = false, description = "call.value.gas be pure")
   public void test01DeployContract() {
     Assert.assertTrue(PublicMethed
         .sendcoin(testAddress001, 1000_000_000L, foundationAddress001, foundationKey001,
