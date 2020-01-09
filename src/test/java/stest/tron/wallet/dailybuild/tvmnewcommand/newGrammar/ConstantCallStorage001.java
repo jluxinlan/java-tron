@@ -1,5 +1,7 @@
 package stest.tron.wallet.dailybuild.tvmnewcommand.newGrammar;
 
+import static org.hamcrest.core.StringContains.containsString;
+
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.util.HashMap;
@@ -141,8 +143,7 @@ public class ConstantCallStorage001 {
         ByteArray.toInt(transactionExtention.getConstantResult(0).toByteArray()));
   }
 
-  @Test(enabled = true, description = "TriggerconstantContract storage date by another contract "
-      + "view function")
+  @Test(enabled = true, description = "TriggerconstantContract storage date by another contract ")
   public void testConstantCallStorage002() {
 
     String filePath = "src/test/resources/soliditycode/constantCallStorage001.sol";
@@ -175,6 +176,71 @@ public class ConstantCallStorage001 {
     Assert.assertEquals(123,
         ByteArray.toInt(transactionExtention.getConstantResult(0).toByteArray()));
 
+  }
+
+
+  @Test(enabled = true, description = "TriggerconstantContract storage date by another contract "
+      + "view function, use 0.5.* version solidity complier")
+  public void testConstantCallStorage003() {
+    String filePath = "src/test/resources/soliditycode/constantCallStorage002.sol";
+    String contractName = "UseNotView";
+    HashMap retMap = PublicMethed.getBycodeAbi(filePath, contractName);
+    String code = retMap.get("byteCode").toString();
+    String abi = retMap.get("abI").toString();
+    byte[] contractAddress002 = PublicMethed
+      .deployContract(contractName, abi, code, "", maxFeeLimit,
+        0L, 100, null, contractExcKey, contractExcAddress, blockingStubFull);
+    PublicMethed.waitProduceNextBlock(blockingStubFull);
+    SmartContract smartContract = PublicMethed.getContract(contractAddress002, blockingStubFull);
+    Assert.assertFalse(smartContract.getAbi().toString().isEmpty());
+    Assert.assertTrue(smartContract.getName().equalsIgnoreCase(contractName));
+    Assert.assertFalse(smartContract.getBytecode().toString().isEmpty());
+    PublicMethed.waitProduceNextBlock(blockingStubFull);
+
+    TransactionExtention transactionExtention = PublicMethed
+        .triggerConstantContractForExtention(contractAddress002,
+        "setnumuseproxy(address)", "\"" + WalletClient.encode58Check(contractAddress) + "\"", false,
+        0, 0, "0", 0, contractExcAddress, contractExcKey, blockingStubFull);
+    logger.info("transactionExtention: " + transactionExtention);
+    Assert.assertFalse(transactionExtention.getResult().getResult());
+    Assert.assertThat(ByteArray.toStr(transactionExtention.getResult().getMessage().toByteArray()),
+        containsString("Not enough energy"));
+  }
+
+
+  @Test(enabled = false, description = "TriggerconstantContract storage date by another contract "
+      + "view function, use 0.4.* version solidity complier")
+  public void testConstantCallStorage004() {
+    String filePath = "src/test/resources/soliditycode/constantCallStorage002.sol";
+    String contractName = "UseNotView";
+    HashMap retMap = PublicMethed.getBycodeAbi(filePath, contractName);
+    String code = retMap.get("byteCode").toString();
+    String abi = retMap.get("abI").toString();
+    byte[] contractAddress002 = PublicMethed
+      .deployContract(contractName, abi, code, "", maxFeeLimit,
+        0L, 100, null, contractExcKey, contractExcAddress, blockingStubFull);
+    PublicMethed.waitProduceNextBlock(blockingStubFull);
+    SmartContract smartContract = PublicMethed.getContract(contractAddress002, blockingStubFull);
+    Assert.assertFalse(smartContract.getAbi().toString().isEmpty());
+    Assert.assertTrue(smartContract.getName().equalsIgnoreCase(contractName));
+    Assert.assertFalse(smartContract.getBytecode().toString().isEmpty());
+    PublicMethed.waitProduceNextBlock(blockingStubFull);
+
+    TransactionExtention transactionExtention = PublicMethed
+        .triggerConstantContractForExtention(contractAddress002,
+        "setnumuseproxy(address)", "\"" + WalletClient.encode58Check(contractAddress) + "\"", false,
+        0, 0, "0", 0, contractExcAddress, contractExcKey, blockingStubFull);
+    logger.info("transactionExtention: " + transactionExtention);
+    Assert.assertEquals(138,
+        ByteArray.toInt(transactionExtention.getConstantResult(0).toByteArray()));
+
+    transactionExtention = PublicMethed
+      .triggerConstantContractForExtention(contractAddress,
+        "num()", "#", false,
+        0, 0, "0", 0, contractExcAddress, contractExcKey, blockingStubFull);
+    Assert.assertTrue(transactionExtention.getResult().getResult());
+    Assert.assertEquals(123,
+        ByteArray.toInt(transactionExtention.getConstantResult(0).toByteArray()));
   }
 
   /**
