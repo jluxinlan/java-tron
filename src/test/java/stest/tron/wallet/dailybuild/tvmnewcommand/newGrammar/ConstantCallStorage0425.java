@@ -56,7 +56,7 @@ public class ConstantCallStorage0425 {
   /**
    * constructor.
    */
-  @BeforeClass(enabled = true)
+  @BeforeClass(enabled = false)
   public void beforeClass() {
 
     channelFull = ManagedChannelBuilder.forTarget(fullnode)
@@ -72,7 +72,7 @@ public class ConstantCallStorage0425 {
     PublicMethed.waitProduceNextBlock(blockingStubFull);
   }
 
-  @Test(enabled = true, description = "Deploy contract without abi")
+  @Test(enabled = false, description = "Deploy contract without abi")
   public void test01DeployContract() {
     //before deploy, check account resource
     AccountResourceMessage accountResource = PublicMethed.getAccountResource(dev001Address,
@@ -146,7 +146,7 @@ public class ConstantCallStorage0425 {
     Assert.assertTrue(beforeNetUsed + netUsed >= afterNetUsed);
   }
 
-  @Test(enabled = true, description = "Trigger contract constant function without ABI")
+  @Test(enabled = false, description = "Trigger contract constant function without ABI")
   public void test02TriggerContract() {
     String triggerTxid = PublicMethed
         .triggerContract(contractAddress, "changeBool(bool)", "true", false,
@@ -169,9 +169,8 @@ public class ConstantCallStorage0425 {
     Assert.assertEquals(1, ByteArray.toInt(infoById1.get().getLog(0).getData().toByteArray()));
   }
 
-  @Test(enabled = true, description = "TriggerConstantContract bool constant function")
+  @Test(enabled = false, description = "TriggerConstantContract bool constant function")
   public void test03TriggerConstantContract() {
-//    contractAddress = PublicMethed.decode58Check("TUADcU6vvsHZo3cwZAkAwTXKb5E9GRssPK");
     // bool
     TransactionExtention transactionExtention = PublicMethed
         .triggerConstantContractForExtention(contractAddress, "changeBool(bool)", "false", false, 0,
