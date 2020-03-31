@@ -234,10 +234,6 @@ public class WalletTestZenToken004 {
     String memo2 = "Shield to  shield address2 transaction";
     shieldOutList = PublicMethed.addShieldOutputList(shieldOutList, shieldAddress2,
         "" + sendToShiledAddress2Amount, memo2);
-<<<<<<< HEAD
-
-=======
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     //When receiver public address don't active,the fee is 1000000
     ECKey ecKey3 = new ECKey(Utils.getRandom());
     byte[] notActivePublicAddress = ecKey3.getAddress();
@@ -272,12 +268,7 @@ public class WalletTestZenToken004 {
             blockingStubFull);
     logger.info("afterNotActivePublicAssetBalance:" + afterNotActivePublicAssetBalance);
     logger.info("sendToPublicAddressAmount:" + sendToPublicAddressAmount);
-<<<<<<< HEAD
     Assert.assertEquals(afterNotActivePublicAssetBalance, sendToPublicAddressAmount);
-
-=======
-    Assert.assertEquals(afterNotActivePublicAssetBalance,sendToPublicAddressAmount);
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   /**

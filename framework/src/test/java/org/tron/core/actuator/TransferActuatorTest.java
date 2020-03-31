@@ -130,16 +130,6 @@ public class TransferActuatorTest {
             .build());
   }
 
-  private Any getContract(long count, byte[] address) {
-    long nowTime = new Date().getTime();
-    return Any.pack(
-        TransferContract.newBuilder()
-            .setOwnerAddress(ByteString.copyFrom(ByteArray.fromHexString(OWNER_ADDRESS)))
-            .setToAddress(ByteString.copyFrom(address))
-            .setAmount(count)
-            .build());
-  }
-
   @Test
   public void rightTransfer() {
     TransferActuator actuator = new TransferActuator();
@@ -483,8 +473,6 @@ public class TransferActuatorTest {
     }
   }
 
-<<<<<<< HEAD
-
   @Test
   public void commonErrorCheck() {
     TransferActuator actuator = new TransferActuator();
@@ -509,11 +497,6 @@ public class TransferActuatorTest {
   public void transferToSmartContractAddress()
       throws ContractExeException, ReceiptCheckErrException, VMIllegalException,
       ContractValidateException, BalanceInsufficientException {
-=======
-  @Test
-  public void transferToSmartContractAddress()
-      throws ContractExeException, ReceiptCheckErrException, VMIllegalException, ContractValidateException, BalanceInsufficientException {
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     dbManager.getDynamicPropertiesStore().saveForbidTransferToContract(1);
     String contractName = "testContract";
     byte[] address = Hex.decode(OWNER_ADDRESS);
@@ -527,13 +510,8 @@ public class TransferActuatorTest {
         + "d0565b005b6100c661016e565b60405173ffffffffffffffffffffffffffffffffffffffff87169084156108"
         + "fc029085906000818181858888f1505060405173ffffffffffffffffffffffffffffffffffffffff89169350"
         + "85156108fc0292508591506000818181858888f1505060405173ffffffffffffffffffffffffffffffffffff"
-<<<<<<< HEAD
         + "ffff8816935084156108fc0292508491506000818181858888f15050505050505050505050565b56fea16562"
         + "7a7a72305820cc2d598d1b3f968bbdc7825ce83d22dad48192f4bf95bda7f9e4ddf61669ba830029";
-=======
-        + "ffff8816935084156108fc0292508491506000818181858888f15050505050505050505050565b56fea165627"
-        + "a7a72305820cc2d598d1b3f968bbdc7825ce83d22dad48192f4bf95bda7f9e4ddf61669ba830029";
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
     long value = 1;
     long feeLimit = 100000000;
@@ -545,13 +523,8 @@ public class TransferActuatorTest {
             deposit, null);
 
     TransferActuator actuator = new TransferActuator();
-<<<<<<< HEAD
     actuator.setChainBaseManager(dbManager.getChainBaseManager())
         .setAny(getContract(1, contractAddress));
-=======
-    actuator.setChainBaseManager(dbManager.getChainBaseManager()).
-        setAny(getContract(1, contractAddress));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     TransactionResultCapsule ret = new TransactionResultCapsule();
     try {
       actuator.validate();
@@ -560,18 +533,12 @@ public class TransferActuatorTest {
       AccountCapsule owner =
           dbManager.getAccountStore().get(ByteArray.fromHexString(OWNER_ADDRESS));
       AccountCapsule toAccount =
-<<<<<<< HEAD
           dbManager.getAccountStore().get(contractAddress);
-=======
-          dbManager.getAccountStore().get(ByteArray.fromHexString(TO_ADDRESS));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     } catch (ContractValidateException e) {
       Assert.assertTrue(e.getMessage().contains("Cannot transfer"));
     }
   }
-<<<<<<< HEAD
 
-=======
   private Any getContract(long count, byte[] address) {
     long nowTime = new Date().getTime();
     return Any.pack(
@@ -581,6 +548,4 @@ public class TransferActuatorTest {
             .setAmount(count)
             .build());
   }
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
-
 }

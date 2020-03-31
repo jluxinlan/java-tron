@@ -12,10 +12,6 @@ import org.spongycastle.util.encoders.Hex;
 import org.tron.common.crypto.Hash;
 import org.tron.common.storage.Deposit;
 import org.tron.common.storage.DepositImpl;
-<<<<<<< HEAD
-=======
-import org.tron.common.utils.Hash;
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.common.utils.WalletUtil;
 import org.tron.core.Wallet;
 import org.tron.core.capsule.BlockCapsule;

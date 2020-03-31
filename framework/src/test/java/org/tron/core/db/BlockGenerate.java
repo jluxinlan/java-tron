@@ -3,11 +3,7 @@ package org.tron.core.db;
 import com.google.protobuf.ByteString;
 import org.tron.common.crypto.ECKey;
 import org.tron.common.crypto.ECKey.ECDSASignature;
-<<<<<<< HEAD
 import org.tron.common.parameter.CommonParameter;
-=======
-import org.tron.common.utils.DBConfig;
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.common.utils.Sha256Hash;
 import org.tron.consensus.base.Param;
 import org.tron.consensus.base.Param.Miner;
@@ -53,12 +49,8 @@ public class BlockGenerate {
         .build();
 
     ECKey ecKey = ECKey.fromPrivate(privateKey);
-<<<<<<< HEAD
     ECDSASignature signature = ecKey.sign(Sha256Hash.of(CommonParameter
         .getInstance().isECKeyCryptoEngine(), raw.toByteArray()).getBytes());
-=======
-    ECDSASignature signature = ecKey.sign(Sha256Hash.of(DBConfig.isECKeyCryptoEngine(), raw.toByteArray()).getBytes());
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     ByteString sign = ByteString.copyFrom(signature.toByteArray());
 
     BlockHeader blockHeader = block.getBlockHeader().toBuilder()

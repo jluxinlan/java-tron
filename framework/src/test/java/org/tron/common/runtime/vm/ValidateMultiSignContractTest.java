@@ -13,16 +13,12 @@ import org.tron.common.application.Application;
 import org.tron.common.application.ApplicationFactory;
 import org.tron.common.application.TronApplicationContext;
 import org.tron.common.crypto.ECKey;
-<<<<<<< HEAD
 import org.tron.common.crypto.Hash;
 import org.tron.common.parameter.CommonParameter;
 import org.tron.common.utils.ByteArray;
 import org.tron.common.utils.ByteUtil;
 import org.tron.common.utils.Sha256Hash;
 import org.tron.common.utils.StringUtil;
-=======
-import org.tron.common.utils.*;
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.core.Constant;
 import org.tron.core.Wallet;
 import org.tron.core.capsule.AccountCapsule;
@@ -70,16 +66,8 @@ public class ValidateMultiSignContractTest {
 
     //Address non exist
     Assert.assertEquals(
-<<<<<<< HEAD
         validateMultiSign(StringUtil.encode58Check(key.getAddress()), 1, hash, signs)
             .getValue(), DataWord.ZERO().getData());
-=======
-        validateMultiSign(WalletUtil.encode58Check(key.getAddress()), 1, hash, signs)
-            .getValue()
-        , DataWord.ZERO().getData());
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
-
-
   }
 
   @Test
@@ -119,22 +107,14 @@ public class ValidateMultiSignContractTest {
 
     byte[] address = key.getAddress();
     int permissionId = 2;
-<<<<<<< HEAD
     byte[] data = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), longData);
-=======
-    byte[] data = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),longData);
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
     //combine data
     byte[] merged = ByteUtil.merge(address, ByteArray.fromInt(permissionId), data);
     //sha256 of it
-<<<<<<< HEAD
     byte[] toSign = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), merged);
-=======
-    byte[] toSign = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),merged);
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
     //sign data
 
@@ -145,55 +125,30 @@ public class ValidateMultiSignContractTest {
     signs.add(Hex.toHexString(key2.sign(toSign).toByteArray()));
 
     Assert.assertEquals(
-<<<<<<< HEAD
         validateMultiSign(StringUtil.encode58Check(key.getAddress()), permissionId, data, signs)
             .getValue(), DataWord.ONE().getData());
-=======
-        validateMultiSign(WalletUtil.encode58Check(key.getAddress()), permissionId, data, signs)
-            .getValue()
-        , DataWord.ONE().getData());
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
     //weight not enough
     signs = new ArrayList<>();
     signs.add(Hex.toHexString(key1.sign(toSign).toByteArray()));
     Assert.assertEquals(
-<<<<<<< HEAD
         validateMultiSign(StringUtil.encode58Check(key.getAddress()), permissionId, data, signs)
             .getValue(), DataWord.ZERO().getData());
-=======
-        validateMultiSign(WalletUtil.encode58Check(key.getAddress()), permissionId, data, signs)
-            .getValue()
-        , DataWord.ZERO().getData());
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
     //put wrong sign
     signs = new ArrayList<>();
     signs.add(Hex.toHexString(key1.sign(toSign).toByteArray()));
     Assert.assertEquals(
-<<<<<<< HEAD
         validateMultiSign(StringUtil.encode58Check(key.getAddress()), permissionId, data, signs)
             .getValue(), DataWord.ZERO().getData());
-=======
-        validateMultiSign(WalletUtil.encode58Check(key.getAddress()), permissionId, data, signs)
-            .getValue()
-        , DataWord.ZERO().getData());
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
+
     signs = new ArrayList<>();
     signs.add(Hex.toHexString(key1.sign(toSign).toByteArray()));
     signs.add(Hex.toHexString(new ECKey().sign(toSign).toByteArray()));
 
     Assert.assertEquals(
-<<<<<<< HEAD
         validateMultiSign(StringUtil.encode58Check(key.getAddress()), permissionId, data, signs)
             .getValue(), DataWord.ZERO().getData());
-=======
-        validateMultiSign(WalletUtil.encode58Check(key.getAddress()), permissionId, data, signs)
-            .getValue()
-        , DataWord.ZERO().getData());
-
-
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
 

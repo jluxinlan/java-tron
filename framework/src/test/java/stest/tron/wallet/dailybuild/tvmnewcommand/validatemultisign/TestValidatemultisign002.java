@@ -20,11 +20,7 @@ import org.tron.common.crypto.ECKey;
 import org.tron.common.parameter.CommonParameter;
 import org.tron.common.utils.ByteArray;
 import org.tron.common.utils.ByteUtil;
-<<<<<<< HEAD
 import org.tron.common.utils.StringUtil;
-=======
-import org.tron.common.utils.DBConfig;
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.common.utils.Utils;
 import org.tron.common.utils.WalletUtil;
 import org.tron.core.Wallet;
@@ -191,28 +187,16 @@ public class TestValidatemultisign002 {
     Transaction transaction = PublicMethedForMutiSign.sendcoinWithPermissionIdNotSign(
         fromAddress, 1L, ownerAddress, permissionId, ownerKey, blockingStubFull);
     transaction = TransactionUtils.setTimestamp(transaction);
-<<<<<<< HEAD
     byte[] hash = Sha256Hash.of(CommonParameter.getInstance().isECKeyCryptoEngine(),
         transaction.getRawData().toByteArray()).getBytes();
 
     byte[] merged = ByteUtil.merge(ownerAddress, ByteArray.fromInt(permissionId), hash);
     byte[] tosign = Sha256Hash.hash(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), merged);
-=======
-    byte[] hash = Sha256Hash.of(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()).getBytes();
-
-    byte[] merged = ByteUtil.merge(ownerAddress, ByteArray.fromInt(permissionId), hash);
-    byte[] tosign = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),merged);
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
-
     signatures.add(Hex.toHexString(ecKey003.sign(tosign).toByteArray()));
 
     // Trigger with one signature
-<<<<<<< HEAD
     List<Object> parameters = Arrays.asList(StringUtil.encode58Check(ownerAddress),
-=======
-    List<Object> parameters = Arrays.asList(WalletUtil.encode58Check(ownerAddress),
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         permissionId, "0x" + Hex.toHexString(hash), signatures);
     String input = PublicMethed.parametersString(parameters);
 
@@ -236,11 +220,7 @@ public class TestValidatemultisign002 {
     signatures.add(Hex.toHexString(ecKey004.sign(tosign).toByteArray()));
     signatures.add(Hex.toHexString(ecKey005.sign(tosign).toByteArray()));
 
-<<<<<<< HEAD
     parameters = Arrays.asList(StringUtil.encode58Check(ownerAddress),
-=======
-    parameters = Arrays.asList(WalletUtil.encode58Check(ownerAddress),
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         permissionId, "0x" + Hex.toHexString(hash), signatures);
     input = PublicMethed.parametersString(parameters);
 
@@ -262,11 +242,7 @@ public class TestValidatemultisign002 {
     signatures.add(Hex.toHexString(ecKey005.sign(tosign).toByteArray()));
     signatures.add(Hex.toHexString(ecKey006.sign(tosign).toByteArray()));
 
-<<<<<<< HEAD
     parameters = Arrays.asList(StringUtil.encode58Check(ownerAddress),
-=======
-    parameters = Arrays.asList(WalletUtil.encode58Check(ownerAddress),
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         permissionId, "0x" + Hex.toHexString(hash), signatures);
     input = PublicMethed.parametersString(parameters);
 
@@ -291,19 +267,12 @@ public class TestValidatemultisign002 {
     Transaction transaction = PublicMethedForMutiSign.sendcoinWithPermissionIdNotSign(
         fromAddress, 1L, ownerAddress, permissionId, ownerKey, blockingStubFull);
     transaction = TransactionUtils.setTimestamp(transaction);
-<<<<<<< HEAD
     byte[] hash = Sha256Hash.of(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()).getBytes();
 
     byte[] merged = ByteUtil.merge(ownerAddress, ByteArray.fromInt(permissionId), hash);
     byte[] tosign = Sha256Hash.hash(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), merged);
-=======
-    byte[] hash = Sha256Hash.of(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()).getBytes();
-
-    byte[] merged = ByteUtil.merge(ownerAddress, ByteArray.fromInt(permissionId), hash);
-    byte[] tosign = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),merged);
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
     // signatures with Duplicate signatures but weight enough
     signatures.add(Hex.toHexString(ecKey001.sign(tosign).toByteArray()));
@@ -311,11 +280,7 @@ public class TestValidatemultisign002 {
     signatures.add(Hex.toHexString(ecKey004.sign(tosign).toByteArray()));
     signatures.add(Hex.toHexString(ecKey004.sign(tosign).toByteArray()));
 
-<<<<<<< HEAD
     List<Object> parameters = Arrays.asList(StringUtil.encode58Check(ownerAddress),
-=======
-    List<Object> parameters = Arrays.asList(WalletUtil.encode58Check(ownerAddress),
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         permissionId, "0x" + Hex.toHexString(hash), signatures);
     String input = PublicMethed.parametersString(parameters);
 
@@ -338,11 +303,7 @@ public class TestValidatemultisign002 {
     signatures.add(Hex.toHexString(ecKey001.sign(tosign).toByteArray()));
     signatures.add(Hex.toHexString(ecKey004.sign(tosign).toByteArray()));
 
-<<<<<<< HEAD
     parameters = Arrays.asList(StringUtil.encode58Check(ownerAddress),
-=======
-    parameters = Arrays.asList(WalletUtil.encode58Check(ownerAddress),
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         permissionId, "0x" + Hex.toHexString(hash), signatures);
     input = PublicMethed.parametersString(parameters);
 
@@ -364,11 +325,7 @@ public class TestValidatemultisign002 {
     signatures.add(Hex.toHexString(ecKey005.sign(tosign).toByteArray()));
     signatures.add(Hex.toHexString(ecKey005.sign(tosign).toByteArray()));
 
-<<<<<<< HEAD
     parameters = Arrays.asList(StringUtil.encode58Check(ownerAddress),
-=======
-    parameters = Arrays.asList(WalletUtil.encode58Check(ownerAddress),
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         permissionId, "0x" + Hex.toHexString(hash), signatures);
     input = PublicMethed.parametersString(parameters);
 
@@ -393,29 +350,18 @@ public class TestValidatemultisign002 {
     Transaction transaction = PublicMethedForMutiSign.sendcoinWithPermissionIdNotSign(
         fromAddress, 1L, ownerAddress, permissionId, ownerKey, blockingStubFull);
     transaction = TransactionUtils.setTimestamp(transaction);
-<<<<<<< HEAD
     byte[] hash = Sha256Hash.of(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()).getBytes();
 
     byte[] merged = ByteUtil.merge(ownerAddress, ByteArray.fromInt(permissionId), hash);
     byte[] tosign = Sha256Hash.hash(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), merged);
-=======
-    byte[] hash = Sha256Hash.of(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()).getBytes();
-
-    byte[] merged = ByteUtil.merge(ownerAddress, ByteArray.fromInt(permissionId), hash);
-    byte[] tosign = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),merged);
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
     // signatures with weight not enough
     signatures.add(Hex.toHexString(ecKey001.sign(tosign).toByteArray()));
     signatures.add(Hex.toHexString(ecKey004.sign(tosign).toByteArray()));
 
-<<<<<<< HEAD
     List<Object> parameters = Arrays.asList(StringUtil.encode58Check(ownerAddress),
-=======
-    List<Object> parameters = Arrays.asList(WalletUtil.encode58Check(ownerAddress),
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         permissionId, "0x" + Hex.toHexString(hash), signatures);
     String input = PublicMethed.parametersString(parameters);
 

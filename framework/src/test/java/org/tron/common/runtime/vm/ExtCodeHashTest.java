@@ -9,10 +9,6 @@ import org.testng.Assert;
 import org.tron.common.runtime.TVMTestResult;
 import org.tron.common.runtime.TvmTestUtils;
 import org.tron.common.utils.WalletUtil;
-<<<<<<< HEAD
-=======
-import org.tron.core.Wallet;
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.core.exception.ContractExeException;
 import org.tron.core.exception.ContractValidateException;
 import org.tron.core.exception.ReceiptCheckErrException;
@@ -52,12 +48,8 @@ public class ExtCodeHashTest extends VMTestBase {
 
     // deploy contract
     Transaction trx = TvmTestUtils.generateDeploySmartContractAndGetTransaction(
-<<<<<<< HEAD
         contractName, address, ABI, factoryCode, value, fee, consumeUserResourcePercent,
         null);
-=======
-        contractName, address, ABI, factoryCode, value, fee, consumeUserResourcePercent, null);
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     byte[] factoryAddress = WalletUtil.generateContractAddress(trx);
     runtime = TvmTestUtils.processTransactionAndReturnRuntime(trx, rootDeposit, null);
     Assert.assertNull(runtime.getRuntimeError());

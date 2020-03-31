@@ -9,14 +9,9 @@ import org.spongycastle.util.encoders.Hex;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.tron.common.crypto.ECKey;
-<<<<<<< HEAD
 import org.tron.common.crypto.Hash;
 import org.tron.common.utils.StringUtil;
-=======
-import org.tron.common.utils.Hash;
 import org.tron.common.utils.WalletUtil;
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
-import org.tron.core.Wallet;
 import org.tron.core.db.TransactionTrace;
 import org.tron.core.vm.PrecompiledContracts;
 import org.tron.core.vm.PrecompiledContracts.BatchValidateSign;
@@ -55,15 +50,9 @@ public class BatchValidateSignContractTest {
         signatures.add(Hex.toHexString(sign));
       }
       if (i == 13) {
-<<<<<<< HEAD
         addresses.add(StringUtil.encode58Check(TransactionTrace.convertToTronAddress(new byte[20])));
       } else {
         addresses.add(StringUtil.encode58Check(key.getAddress()));
-=======
-        addresses.add(WalletUtil.encode58Check(MUtil.convertToTronAddress(new byte[20])));
-      } else {
-        addresses.add(WalletUtil.encode58Check(key.getAddress()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
       }
     }
     Pair<Boolean, byte[]> ret;
@@ -91,11 +80,7 @@ public class BatchValidateSignContractTest {
       } else {
         signatures.add(Hex.toHexString(sign));
       }
-<<<<<<< HEAD
       addresses.add(StringUtil.encode58Check(key.getAddress()));
-=======
-      addresses.add(WalletUtil.encode58Check(key.getAddress()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
     ret = validateMultiSign(hash, signatures, addresses);
     Assert.assertEquals(ret.getValue().length, 32);
@@ -113,18 +98,11 @@ public class BatchValidateSignContractTest {
       ECKey key = new ECKey();
       byte[] sign = key.sign(hash).toByteArray();
       if (i % 5 == 0) {
-<<<<<<< HEAD
         addresses.add(StringUtil.encode58Check(TransactionTrace
             .convertToTronAddress(new byte[20])));
         signatures.add(Hex.toHexString(DataWord.ONE().getData()));
       } else {
         addresses.add(StringUtil.encode58Check(key.getAddress()));
-=======
-        addresses.add(WalletUtil.encode58Check(MUtil.convertToTronAddress(new byte[20])));
-        signatures.add(Hex.toHexString(DataWord.ONE().getData()));
-      } else {
-        addresses.add(WalletUtil.encode58Check(key.getAddress()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         signatures.add(Hex.toHexString(sign));
       }
     }
@@ -164,11 +142,7 @@ public class BatchValidateSignContractTest {
       } else {
         signatures.add(Hex.toHexString(sign));
       }
-<<<<<<< HEAD
       addresses.add(StringUtil.encode58Check(key.getAddress()));
-=======
-      addresses.add(WalletUtil.encode58Check(key.getAddress()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
     ret = validateMultiSign(hash, signatures, addresses);
     Assert.assertEquals(ret.getValue().length, 32);

@@ -94,11 +94,7 @@ public class batchValidateSignContract005 {
       ECKey key = new ECKey();
       byte[] sign = key.sign(hash).toByteArray();
       signatures.add(Hex.toHexString(sign));
-<<<<<<< HEAD
       addresses.add(StringUtil.encode58Check(key.getAddress()));
-=======
-      addresses.add(WalletUtil.encode58Check(key.getAddress()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
     List<Object> parameters = Arrays.asList("0x" + "", signatures, addresses);
     String input = PublicMethed.parametersString(parameters);
@@ -158,11 +154,7 @@ public class batchValidateSignContract005 {
     for (int i = 0; i < 16; i++) {
       ECKey key = new ECKey();
       byte[] sign = key.sign(hash).toByteArray();
-<<<<<<< HEAD
       addresses.add(StringUtil.encode58Check(key.getAddress()));
-=======
-      addresses.add(WalletUtil.encode58Check(key.getAddress()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
     List<Object> parameters = Arrays.asList("0x" + Hex.toHexString(hash), signatures, addresses);
     String input = PublicMethed.parametersString(parameters);

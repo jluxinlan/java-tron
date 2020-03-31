@@ -39,16 +39,11 @@ import org.tron.api.WalletGrpc;
 import org.tron.api.WalletSolidityGrpc;
 import org.tron.common.crypto.ECKey;
 import org.tron.common.crypto.ECKey.ECDSASignature;
-<<<<<<< HEAD
 import org.tron.common.parameter.CommonParameter;
 import org.tron.common.utils.Base58;
 import org.tron.common.utils.ByteArray;
 import org.tron.common.utils.ByteUtil;
 import org.tron.common.utils.Commons;
-=======
-import org.tron.common.utils.*;
-import org.tron.common.utils.Base58;
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.core.Wallet;
 import org.tron.core.exception.CancelException;
 import org.tron.core.zen.address.ExpandedSpendingKey;
@@ -288,12 +283,8 @@ public class PublicMethedForMutiSign {
       if (result == false) {
         return null;
       } else {
-<<<<<<< HEAD
         return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-        return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
       }
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -568,12 +559,8 @@ public class PublicMethedForMutiSign {
     if (result == false) {
       return null;
     } else {
-<<<<<<< HEAD
       return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
           .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-      return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
   }
 
@@ -950,12 +937,8 @@ public class PublicMethedForMutiSign {
     if (result == false) {
       return null;
     } else {
-<<<<<<< HEAD
       return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
           .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-      return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
   }
 
@@ -1094,12 +1077,8 @@ public class PublicMethedForMutiSign {
     if (result == false) {
       return null;
     } else {
-<<<<<<< HEAD
       return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
           .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-      return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
   }
 
@@ -1725,13 +1704,8 @@ public class PublicMethedForMutiSign {
     transaction = signTransaction(transaction, blockingStubFull, permissionKeyString);
 
     System.out.println(
-<<<<<<< HEAD
         "txid = " + ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), transaction.getRawData().toByteArray())));
-=======
-        "txid = " + ByteArray
-            .toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray())));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     contractAddress = PublicMethed.generateContractAddress(transaction, owner);
     System.out.println(
         "Your smart contract address will be: " + WalletClient.encode58Check(contractAddress));
@@ -1852,13 +1826,8 @@ public class PublicMethedForMutiSign {
     }
     transaction = signTransaction(ecKey, transaction);
     System.out.println(
-<<<<<<< HEAD
         "txid = " + ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), transaction.getRawData().toByteArray())));
-=======
-        "txid = " + ByteArray
-            .toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray())));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     byte[] contractAddress = PublicMethed.generateContractAddress(transaction, owner);
     System.out.println(
         "Your smart contract address will be: " + WalletClient.encode58Check(contractAddress));
@@ -1866,12 +1835,8 @@ public class PublicMethedForMutiSign {
     if (response.getResult() == false) {
       return null;
     } else {
-<<<<<<< HEAD
       return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
           .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-      return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
   }
 
@@ -2350,7 +2315,6 @@ public class PublicMethedForMutiSign {
       System.out.println("Transaction is empty");
       return null;
     }
-<<<<<<< HEAD
     System.out.println("trigger txid = " + ByteArray
         .toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), transaction.getRawData().toByteArray())));
@@ -2359,15 +2323,6 @@ public class PublicMethedForMutiSign {
     broadcastTransaction(transaction, blockingStubFull);
     return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-    System.out.println(
-        "trigger txid = " + ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData()
-            .toByteArray())));
-    transaction = signTransaction(transaction, blockingStubFull, permissionKeyString);
-
-    broadcastTransaction(transaction, blockingStubFull);
-    return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   /**
@@ -2670,13 +2625,8 @@ public class PublicMethedForMutiSign {
     }
     transaction = signTransaction(ecKey, transaction);
     System.out.println(
-<<<<<<< HEAD
         "txid = " + ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), transaction.getRawData().toByteArray())));
-=======
-        "txid = " + ByteArray
-            .toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray())));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     byte[] contractAddress = PublicMethed.generateContractAddress(transaction, owner);
     System.out.println(
         "Your smart contract address will be: " + WalletClient.encode58Check(contractAddress));
@@ -2685,12 +2635,8 @@ public class PublicMethedForMutiSign {
       return null;
     } else {
       //logger.info("brodacast succesfully");
-<<<<<<< HEAD
       return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
           .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-      return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
   }
 
@@ -2906,12 +2852,8 @@ public class PublicMethedForMutiSign {
     if (response.getResult() == false) {
       return null;
     } else {
-<<<<<<< HEAD
       return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
           .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-      return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
   }
 
@@ -2987,12 +2929,8 @@ public class PublicMethedForMutiSign {
     if (response.getResult() == false) {
       return null;
     } else {
-<<<<<<< HEAD
       return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
           .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-      return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
   }
 
@@ -3012,12 +2950,8 @@ public class PublicMethedForMutiSign {
     ECKey ecKey = temKey;
 
     Transaction.Builder transactionBuilderSigned = transaction.toBuilder();
-<<<<<<< HEAD
     byte[] hash = Sha256Hash.hash(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), transaction.getRawData().toByteArray());
-=======
-    byte[] hash = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray());
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
     ECDSASignature signature = ecKey.sign(hash);
     ByteString bsSign = ByteString.copyFrom(signature.toByteArray());
@@ -3147,15 +3081,10 @@ public class PublicMethedForMutiSign {
    * constructor.
    */
   public static String encode58Check(byte[] input) {
-<<<<<<< HEAD
     byte[] hash0 = Sha256Hash.hash(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), input);
     byte[] hash1 = Sha256Hash.hash(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), hash0);
-=======
-    byte[] hash0 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),input);
-    byte[] hash1 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),hash0);
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     byte[] inputCheck = new byte[input.length + 4];
     System.arraycopy(input, 0, inputCheck, 0, input.length);
     System.arraycopy(hash1, 0, inputCheck, input.length, 4);
@@ -3378,12 +3307,8 @@ public class PublicMethedForMutiSign {
     transaction = transaction.toBuilder().setRawData(raw).build();
 
     Transaction.Builder transactionBuilderSigned = transaction.toBuilder();
-<<<<<<< HEAD
     byte[] hash = Sha256Hash.hash(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), transaction.getRawData().toByteArray());
-=======
-    byte[] hash = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray());
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     ECKey ecKey = temKey;
     ECDSASignature signature = ecKey.sign(hash);
     ByteString bsSign = ByteString.copyFrom(signature.toByteArray());
@@ -3807,7 +3732,6 @@ public class PublicMethedForMutiSign {
       e.printStackTrace();
     }
 
-<<<<<<< HEAD
     System.out.println("trigger txid = " + ByteArray
         .toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), transaction.getRawData().toByteArray())));
@@ -3816,15 +3740,6 @@ public class PublicMethedForMutiSign {
     broadcastTransaction(transaction, blockingStubFull);
     return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-    System.out.println(
-        "trigger txid = " + ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData()
-            .toByteArray())));
-    transaction = signTransaction(transaction, blockingStubFull, permissionKeyString);
-
-    broadcastTransaction(transaction, blockingStubFull);
-    return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   /**
@@ -3838,12 +3753,8 @@ public class PublicMethedForMutiSign {
     byte[] ownerAddress = owneraddress;
 
     // get tx hash
-<<<<<<< HEAD
     byte[] txRawDataHash = Sha256Hash.of(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), trx.getRawData().toByteArray()).getBytes();
-=======
-    byte[] txRawDataHash = Sha256Hash.of(DBConfig.isECKeyCryptoEngine(),trx.getRawData().toByteArray()).getBytes();
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
     // combine
     byte[] combined = new byte[txRawDataHash.length + ownerAddress.length];
@@ -3965,12 +3876,8 @@ public class PublicMethedForMutiSign {
     transaction = signTransaction(transaction, blockingStubFull, permissionKeyString);
 
     System.out.println(
-<<<<<<< HEAD
         "txid = " + ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), transaction.getRawData().toByteArray())));
-=======
-        "txid = " + ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray())));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     contractAddress = generateContractAddress(transaction, owner);
     System.out.println(
         "Your smart contract address will be: " + WalletClient.encode58Check(contractAddress));
@@ -4095,13 +4002,8 @@ public class PublicMethedForMutiSign {
     transaction = signTransaction(transaction, blockingStubFull, permissionKeyString);
 
     System.out.println(
-<<<<<<< HEAD
         "txid = " + ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), transaction.getRawData().toByteArray())));
-=======
-        "txid = " + ByteArray
-            .toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray())));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     contractAddress = PublicMethed.generateContractAddress(transaction, owner);
     System.out.println(
         "Your smart contract address will be: " + WalletClient.encode58Check(contractAddress));
@@ -4198,7 +4100,6 @@ public class PublicMethedForMutiSign {
     } catch (CancelException e) {
       e.printStackTrace();
     }
-<<<<<<< HEAD
     System.out.println("trigger txid = " + ByteArray
         .toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), transaction.getRawData().toByteArray())));
@@ -4207,15 +4108,6 @@ public class PublicMethedForMutiSign {
     broadcastTransaction(transaction, blockingStubFull);
     return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-    System.out.println(
-        "trigger txid = " + ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData()
-            .toByteArray())));
-    transaction = signTransaction(transaction, blockingStubFull, permissionKeyString);
-
-    broadcastTransaction(transaction, blockingStubFull);
-    return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   /**
@@ -4308,12 +4200,8 @@ public class PublicMethedForMutiSign {
     if (result == false) {
       return null;
     } else {
-<<<<<<< HEAD
       return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
           .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-      return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
   }
 
@@ -4608,12 +4496,8 @@ public class PublicMethedForMutiSign {
       if (result == false) {
         return null;
       } else {
-<<<<<<< HEAD
         return ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), transaction.getRawData().toByteArray()));
-=======
-        return ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
       }
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -4905,15 +4789,9 @@ public class PublicMethedForMutiSign {
       e.printStackTrace();
     }
     transaction = signTransaction(transaction, blockingStubFull, permissionKeyString);
-<<<<<<< HEAD
     System.out.println("trigger txid = " + ByteArray
         .toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), transaction.getRawData().toByteArray())));
-=======
-    System.out.println(
-        "trigger txid = " + ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData()
-            .toByteArray())));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     return broadcastTransaction(transaction, blockingStubFull);
   }
 
@@ -5042,7 +4920,6 @@ public class PublicMethedForMutiSign {
         transaction = transaction.toBuilder().setRawData(raw).build();
 
         transaction = signTransactionForShield(transaction, blockingStubFull, permissionKeyString);
-<<<<<<< HEAD
         System.out.println("trigger txid = " + ByteArray
             .toHexString(Sha256Hash.hash(CommonParameter.getInstance()
                 .isECKeyCryptoEngine(), transaction.getRawData().toByteArray())));
@@ -5050,15 +4927,6 @@ public class PublicMethedForMutiSign {
         System.out.println("trigger txid = " + ByteArray
             .toHexString(Sha256Hash.hash(CommonParameter.getInstance()
                 .isECKeyCryptoEngine(), transaction.getRawData().toByteArray())));
-=======
-        System.out.println(
-            "trigger txid = " + ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData()
-                .toByteArray())));
-      } else {
-        System.out.println(
-            "trigger txid = " + ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData()
-                .toByteArray())));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
       }
     } catch (Exception e) {
       System.out.println(e);

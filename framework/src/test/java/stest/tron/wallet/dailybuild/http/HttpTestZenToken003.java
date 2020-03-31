@@ -163,12 +163,9 @@ public class HttpTestZenToken003 {
 
     shieldOutList.clear();
     Long sendToPublicAddressAmount = 1 * zenTokenFee;
-<<<<<<< HEAD
+
     Long sendToShiledAddressAmount = sendTokenAmount - sendToPublicAddressAmount
         - zenTokenWhenCreateNewAddress;
-=======
-    Long sendToShiledAddressAmount = sendTokenAmount - sendToPublicAddressAmount - zenTokenWhenCreateNewAddress;
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     memo3 = "Send shield to receiver shield memo in" + System.currentTimeMillis();
     shieldOutList = HttpMethed.addShieldOutputList(httpnode, shieldOutList, receiverShieldAddress3,
         "" + sendToShiledAddressAmount, memo3);

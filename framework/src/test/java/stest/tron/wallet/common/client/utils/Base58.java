@@ -1,15 +1,8 @@
 package stest.tron.wallet.common.client.utils;
 
-import static stest.tron.wallet.common.client.utils.PublicMethed.decode58Check;
-
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-<<<<<<< HEAD
 import org.tron.common.parameter.CommonParameter;
-=======
-
-import org.tron.common.utils.DBConfig;
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.common.utils.Sha256Hash;
 
 public class Base58 {
@@ -187,8 +180,6 @@ public class Base58 {
     return address;
   }
 
-<<<<<<< HEAD
-=======
   private static byte[] decode58Check(String input) {
     byte[] decodeCheck = Base58.decode(input);
     if (decodeCheck.length <= 4) {
@@ -196,8 +187,10 @@ public class Base58 {
     }
     byte[] decodeData = new byte[decodeCheck.length - 4];
     System.arraycopy(decodeCheck, 0, decodeData, 0, decodeData.length);
-    byte[] hash0 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),decodeData);
-    byte[] hash1 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),hash0);
+    byte[] hash0 = Sha256Hash.hash(CommonParameter.getInstance()
+        .isECKeyCryptoEngine(),decodeData);
+    byte[] hash1 = Sha256Hash.hash(CommonParameter.getInstance()
+        .isECKeyCryptoEngine(),hash0);
     if (hash1[0] == decodeCheck[decodeData.length]
         && hash1[1] == decodeCheck[decodeData.length + 1]
         && hash1[2] == decodeCheck[decodeData.length + 2]
@@ -207,7 +200,6 @@ public class Base58 {
     return null;
   }
 
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   /**
    * constructor.
    */
@@ -238,15 +230,10 @@ public class Base58 {
    */
 
   public static String encode58Check(byte[] input) {
-<<<<<<< HEAD
     byte[] hash0 = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), input);
     byte[] hash1 = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), hash0);
-=======
-    byte[] hash0 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),input);
-    byte[] hash1 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),hash0);
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     byte[] inputCheck = new byte[input.length + 4];
     System.arraycopy(input, 0, inputCheck, 0, input.length);
     System.arraycopy(hash1, 0, inputCheck, input.length, 4);

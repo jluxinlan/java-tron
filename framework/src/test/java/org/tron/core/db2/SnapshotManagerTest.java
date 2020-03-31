@@ -85,11 +85,7 @@ public class SnapshotManagerTest {
     ProtoCapsuleTest protoCapsule = new ProtoCapsuleTest("close".getBytes());
     for (int i = 1; i < 11; i++) {
       ProtoCapsuleTest testProtoCapsule = new ProtoCapsuleTest(("close" + i).getBytes());
-<<<<<<< HEAD
-      try (ISession session = revokingDatabase.buildSession()) {
-=======
       try (ISession _  = revokingDatabase.buildSession()) {
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         tronDatabase.put(protoCapsule.getData(), testProtoCapsule);
       }
     }

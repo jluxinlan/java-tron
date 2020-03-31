@@ -125,11 +125,7 @@ public class BlockCapsuleTest {
 
     Assert.assertFalse(blockCapsule0.hasWitnessSignature());
     blockCapsule0
-<<<<<<< HEAD
         .sign(ByteArray.fromHexString(Args.getLocalWitnesses().getPrivateKey()));
-=======
-        .sign(ByteArray.fromHexString(Args.getInstance().getLocalWitnesses().getPrivateKey()));
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     Assert.assertTrue(blockCapsule0.hasWitnessSignature());
   }
 

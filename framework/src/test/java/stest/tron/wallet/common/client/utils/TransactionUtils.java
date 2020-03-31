@@ -23,11 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tron.common.crypto.ECKey;
 import org.tron.common.crypto.ECKey.ECDSASignature;
-<<<<<<< HEAD
 import org.tron.common.parameter.CommonParameter;
-=======
-import org.tron.common.utils.DBConfig;
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.common.utils.Sha256Hash;
 import org.tron.protos.Protocol.Transaction;
 import org.tron.protos.Protocol.Transaction.Contract;
@@ -53,13 +49,8 @@ public class TransactionUtils {
   public static byte[] getHash(Transaction transaction) {
     Transaction.Builder tmp = transaction.toBuilder();
     //tmp.clearId();
-
-<<<<<<< HEAD
     return Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), tmp.build().toByteArray());
-=======
-    return Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),tmp.build().toByteArray());
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   /**
@@ -149,12 +140,8 @@ public class TransactionUtils {
     assert (signedTransaction.getSignatureCount()
         == signedTransaction.getRawData().getContractCount());
     List<Transaction.Contract> listContract = signedTransaction.getRawData().getContractList();
-<<<<<<< HEAD
     byte[] hash = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), signedTransaction.getRawData().toByteArray());
-=======
-    byte[] hash = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),signedTransaction.getRawData().toByteArray());
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     int count = signedTransaction.getSignatureCount();
     if (count == 0) {
       return false;
@@ -184,12 +171,8 @@ public class TransactionUtils {
     ByteString lockSript = ByteString.copyFrom(myKey.getAddress());
     Transaction.Builder transactionBuilderSigned = transaction.toBuilder();
 
-<<<<<<< HEAD
     byte[] hash = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), transaction.getRawData().toByteArray());
-=======
-    byte[] hash = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),transaction.getRawData().toByteArray());
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     List<Contract> listContract = transaction.getRawData().getContractList();
     for (int i = 0; i < listContract.size(); i++) {
       ECDSASignature signature = myKey.sign(hash);

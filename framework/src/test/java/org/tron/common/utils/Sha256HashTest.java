@@ -13,15 +13,10 @@ public class Sha256HashTest {
   public void testHash() {
     //Example from https://github.com/tronprotocol/tips/blob/master/TWP-001.md
     byte[] input = ByteArray.fromHexString("A0E11973395042BA3C0B52B4CDF4E15EA77818F275");
-<<<<<<< HEAD
     byte[] hash0 = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), input);
     byte[] hash1 = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), hash0);
-=======
-    byte[] hash0 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),input);
-    byte[] hash1 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),hash0);
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     Assert.assertEquals(hash0, ByteArray
         .fromHexString("CD5D4A7E8BE869C00E17F8F7712F41DBE2DDBD4D8EC36A7280CD578863717084"));
     Assert.assertEquals(hash1, ByteArray
@@ -40,12 +35,8 @@ public class Sha256HashTest {
       Thread thread =
           new Thread(() -> {
             for (int i = 0; i < 10000; i++) {
-<<<<<<< HEAD
-              byte[] hash0 = Sha256Hash.hash(CommonParameter
-                  .getInstance().isECKeyCryptoEngine(), input);
-=======
-              byte[] hash0 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),input);
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
+              byte[] hash0 = Sha256Hash.hash(CommonParameter.getInstance()
+                  .isECKeyCryptoEngine(),input);
               countAll.incrementAndGet();
               if (!Arrays.equals(hash, hash0)) {
                 countFailed.incrementAndGet();

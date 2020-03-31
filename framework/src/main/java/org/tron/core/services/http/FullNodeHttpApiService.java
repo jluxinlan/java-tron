@@ -232,6 +232,8 @@ public class FullNodeHttpApiService implements Service {
   @Autowired
   private CreateCommonTransactionServlet createCommonTransactionServlet;
   @Autowired
+  private GetTransactionInfoByBlockNumServlet getTransactionInfoByBlockNumServlet;
+  @Autowired
   private MetricsServlet metricsServlet;
 
   private static String getParamsFile(String fileName) {
@@ -394,7 +396,6 @@ public class FullNodeHttpApiService implements Service {
           "/wallet/getdelegatedresource");
       context.addServlet(
           new ServletHolder(getDelegatedResourceAccountIndexServlet),
-<<<<<<< HEAD
           "/wallet/getdelegatedresourceaccountindex");
       context.addServlet(new ServletHolder(setAccountServlet), "/wallet/setaccountid");
       context.addServlet(new ServletHolder(getAccountByIdServlet), "/wallet/getaccountbyid");
@@ -436,47 +437,13 @@ public class FullNodeHttpApiService implements Service {
       context.addServlet(new ServletHolder(updateBrokerageServlet), "/wallet/updateBrokerage");
       context.addServlet(new ServletHolder(createCommonTransactionServlet),
           "/wallet/createCommonTransaction");
-      context.addServlet(new ServletHolder(metricsServlet), "/monitor/getstatsinfo");
-      context.addServlet(new ServletHolder(listNodesServlet), "/net/listnodes");
-      context.addServlet(new ServletHolder(getNodeInfoServlet), "/monitor/getnodeinfo");
-=======
-          "/getdelegatedresourceaccountindex");
-      context.addServlet(new ServletHolder(setAccountServlet), "/setaccountid");
-      context.addServlet(new ServletHolder(getAccountByIdServlet), "/getaccountbyid");
-      // context
-      //     .addServlet(new ServletHolder(getExpandedSpendingKeyServlet), "/getexpandedspendingkey");
-      // context.addServlet(new ServletHolder(getAkFromAskServlet), "/getakfromask");
-      // context.addServlet(new ServletHolder(getNkFromNskServlet), "/getnkfromnsk");
-      // context.addServlet(new ServletHolder(getSpendingKeyServlet), "/getspendingkey");
-      // context
-      //     .addServlet(new ServletHolder(getNewShieldedAddressServlet), "/getnewshieldedaddress");
-      // context.addServlet(new ServletHolder(getDiversifierServlet), "/getdiversifier");
-      // context.addServlet(new ServletHolder(getIncomingViewingKeyServlet), "/getincomingviewingkey");
-      // context.addServlet(new ServletHolder(getZenPaymentAddressServlet), "/getzenpaymentaddress");
-      // context.addServlet(new ServletHolder(createShieldedTransactionServlet),
-      //     "/createshieldedtransaction");
-      // context.addServlet(new ServletHolder(createShieldedTransactionWithoutSpendAuthSigServlet),
-      //     "/createshieldedtransactionwithoutspendauthsig");
-      // context.addServlet(new ServletHolder(scanNoteByIvkServlet), "/scannotebyivk");
-      // context.addServlet(new ServletHolder(scanAndMarkNoteByIvkServlet), "/scanandmarknotebyivk");
-      // context.addServlet(new ServletHolder(scanNoteByOvkServlet), "/scannotebyovk");
-      // context.addServlet(new ServletHolder(getRcmServlet), "/getrcm");
-      // context.addServlet(new ServletHolder(getMerkleTreeVoucherInfoServlet),
-      //     "/getmerkletreevoucherinfo");
-      // context.addServlet(new ServletHolder(isSpendServlet), "/isspend");
-      // context.addServlet(new ServletHolder(createSpendAuthSigServlet), "/createspendauthsig");
-      // context.addServlet(new ServletHolder(createShieldNullifierServlet), "/createshieldnullifier");
-      // context.addServlet(new ServletHolder(getShieldTransactionHashServlet),
-      //     "/getshieldtransactionhash");
-      context.addServlet(new ServletHolder(broadcastHexServlet), "/broadcasthex");
-      context.addServlet(new ServletHolder(getBrokerageServlet), "/getBrokerage");
-      context.addServlet(new ServletHolder(getRewardServlet), "/getReward");
-      context.addServlet(new ServletHolder(updateBrokerageServlet), "/updateBrokerage");
-      context.addServlet(new ServletHolder(createCommonTransactionServlet),
-          "/createCommonTransaction");
       context.addServlet(new ServletHolder(getTransactionInfoByBlockNumServlet),
-          "/gettransactioninfobyblocknum");
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
+          "/wallet/gettransactioninfobyblocknum");
+
+      context.addServlet(new ServletHolder(listNodesServlet), "/net/listnodes");
+
+      context.addServlet(new ServletHolder(metricsServlet), "/monitor/getstatsinfo");
+      context.addServlet(new ServletHolder(getNodeInfoServlet), "/monitor/getnodeinfo");
 
       int maxHttpConnectNumber = Args.getInstance().getMaxHttpConnectNumber();
       if (maxHttpConnectNumber > 0) {

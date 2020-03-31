@@ -1,6 +1,5 @@
 package org.tron.core.services;
 
-import static org.tron.common.utils.Commons.decodeFromBase58Check;
 import static stest.tron.wallet.common.client.Parameter.CommonConstant.ADD_PRE_FIX_BYTE_MAINNET;
 import static stest.tron.wallet.common.client.utils.Base58.decodeFromBase58Check;
 
