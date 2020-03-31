@@ -54,7 +54,6 @@ import org.tron.protos.contract.SmartContractOuterClass.SmartContract.ABI;
 import org.tron.protos.contract.SmartContractOuterClass.SmartContract.ABI.Entry.StateMutabilityType;
 import org.tron.protos.contract.SmartContractOuterClass.TriggerSmartContract;
 
-
 @Slf4j(topic = "capsule")
 @Component
 public class TransactionUtil {
@@ -166,13 +165,13 @@ public class TransactionUtil {
         transaction.getRawData().toByteArray());
   }
 
+
   public static contractResult getContractRet(Transaction transaction) {
     if (transaction.getRetCount() <= 0) {
       return null;
     }
     return transaction.getRet(0).getContractRet();
   }
-
 
   public static long getCallTokenValue(Transaction.Contract contract) {
     try {

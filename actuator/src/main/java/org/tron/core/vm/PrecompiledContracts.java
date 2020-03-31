@@ -347,7 +347,6 @@ public class PrecompiledContracts {
       if (data == null) {
         data = EMPTY_BYTE_ARRAY;
       }
-
       byte[] orig = Sha256Hash.hash(CommonParameter.getInstance()
           .isECKeyCryptoEngine(), data);
       System.arraycopy(orig, 0, target, 0, 20);
@@ -725,7 +724,6 @@ public class PrecompiledContracts {
 
       byte[] combine = ByteUtil
           .merge(convertToTronAddress(addr), ByteArray.fromInt(permissionId), data);
-
       byte[] hash = Sha256Hash.hash(CommonParameter
           .getInstance().isECKeyCryptoEngine(), combine);
 

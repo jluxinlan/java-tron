@@ -252,43 +252,43 @@ public class ProposalUtil {
         }
         break;
       }
-      case ALLOW_SHIELDED_TRANSACTION: {
-        if (!forkController.pass(ForkBlockVersionEnum.VERSION_4_0)) {
-          throw new ContractValidateException(
-              "Bad chain parameter id [ALLOW_SHIELDED_TRANSACTION]");
-        }
-        if (value != 1) {
-          throw new ContractValidateException(
-                  PRE_VALUE_NOT_ONE_ERROR + "ALLOW_SHIELDED_TRANSACTION" + VALUE_NOT_ONE_ERROR);
-        }
-        break;
-      }
-      case SHIELDED_TRANSACTION_FEE: {
-        if (!forkController.pass(ForkBlockVersionEnum.VERSION_4_0)) {
-          throw new ContractValidateException("Bad chain parameter id [SHIELD_TRANSACTION_FEE]");
-        }
-        if (!dynamicPropertiesStore.supportShieldedTransaction()) {
-          throw new ContractValidateException(
-              "Shielded Transaction is not activated, can not set Shielded Transaction fee");
-        }
-        if (dynamicPropertiesStore.getAllowCreationOfContracts() == 0) {
-          throw new ContractValidateException(
-              "[ALLOW_CREATION_OF_CONTRACTS] proposal must be approved "
-                  + "before [FORBID_TRANSFER_TO_CONTRACT] can be proposed");
-        }
-        break;
-      }
-      case SHIELDED_TRANSACTION_CREATE_ACCOUNT_FEE: {
-        if (!forkController.pass(ForkBlockVersionEnum.VERSION_4_0)) {
-          throw new ContractValidateException(
-              "Bad chain parameter id [SHIELDED_TRANSACTION_CREATE_ACCOUNT_FEE]");
-        }
-        if (value < 0 || value > 10_000_000_000L) {
-          throw new ContractValidateException(
-              "Bad SHIELDED_TRANSACTION_CREATE_ACCOUNT_FEE parameter value, valid range is [0,10_000_000_000L]");
-        }
-        break;
-      }
+//      case ALLOW_SHIELDED_TRANSACTION: {
+//        if (!forkController.pass(ForkBlockVersionEnum.VERSION_4_0)) {
+//          throw new ContractValidateException(
+//              "Bad chain parameter id [ALLOW_SHIELDED_TRANSACTION]");
+//        }
+//        if (value != 1) {
+//          throw new ContractValidateException(
+//                  PRE_VALUE_NOT_ONE_ERROR + "ALLOW_SHIELDED_TRANSACTION" + VALUE_NOT_ONE_ERROR);
+//        }
+//        break;
+//      }
+//      case SHIELDED_TRANSACTION_FEE: {
+//        if (!forkController.pass(ForkBlockVersionEnum.VERSION_4_0)) {
+//          throw new ContractValidateException("Bad chain parameter id [SHIELD_TRANSACTION_FEE]");
+//        }
+//        if (!dynamicPropertiesStore.supportShieldedTransaction()) {
+//          throw new ContractValidateException(
+//              "Shielded Transaction is not activated, can not set Shielded Transaction fee");
+//        }
+//        if (dynamicPropertiesStore.getAllowCreationOfContracts() == 0) {
+//          throw new ContractValidateException(
+//              "[ALLOW_CREATION_OF_CONTRACTS] proposal must be approved "
+//                  + "before [FORBID_TRANSFER_TO_CONTRACT] can be proposed");
+//        }
+//        break;
+//      }
+//      case SHIELDED_TRANSACTION_CREATE_ACCOUNT_FEE: {
+//        if (!forkController.pass(ForkBlockVersionEnum.VERSION_4_0)) {
+//          throw new ContractValidateException(
+//              "Bad chain parameter id [SHIELDED_TRANSACTION_CREATE_ACCOUNT_FEE]");
+//        }
+//        if (value < 0 || value > 10_000_000_000L) {
+//          throw new ContractValidateException(
+//              "Bad SHIELDED_TRANSACTION_CREATE_ACCOUNT_FEE parameter value, valid range is [0,10_000_000_000L]");
+//        }
+//        break;
+//      }
       case FORBID_TRANSFER_TO_CONTRACT: {
         if (!forkController.pass(ForkBlockVersionEnum.VERSION_3_6_6)) {
 

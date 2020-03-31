@@ -152,13 +152,8 @@ public class Sha256Hash implements Serializable, Comparable<Sha256Hash> {
   }
 
   /**
-<<<<<<< HEAD
    * Returns a new SM3 MessageDigest instance. This is a convenience method which wraps the checked
    * exception that can never occur with a RuntimeException.
-=======
-   * Returns a new SM3 MessageDigest instance. This is a convenience method which wraps the
-   * checked exception that can never occur with a RuntimeException.
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
    *
    * @return a new SM3 MessageDigest instance
    */

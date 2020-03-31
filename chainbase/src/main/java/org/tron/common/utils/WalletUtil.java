@@ -24,7 +24,7 @@ import org.tron.protos.contract.SmartContractOuterClass.SmartContract.ABI;
 import org.tron.protos.contract.SmartContractOuterClass.SmartContract.ABI.Entry.StateMutabilityType;
 import org.tron.protos.contract.SmartContractOuterClass.TriggerSmartContract;
 
-  public class WalletUtil {
+public class WalletUtil {
 
   public static boolean checkPermissionOperations(Permission permission, Contract contract)
       throws PermissionException {
@@ -37,7 +37,7 @@ import org.tron.protos.contract.SmartContractOuterClass.TriggerSmartContract;
     return b;
   }
 
-    public static byte[] generateContractAddress(Transaction trx) {
+  public static byte[] generateContractAddress(Transaction trx) {
 
     CreateSmartContract contract = ContractCapsule.getSmartContractFromTransaction(trx);
     byte[] ownerAddress = contract.getOwnerAddress().toByteArray();
@@ -57,16 +57,6 @@ import org.tron.protos.contract.SmartContractOuterClass.TriggerSmartContract;
   public static byte[] generateContractAddress2(byte[] address, byte[] salt, byte[] code) {
     byte[] mergedData = ByteUtil.merge(address, salt, Hash.sha3(code));
     return Hash.sha3omit12(mergedData);
-  }
-
-  // for `CREATE`
-  public static byte[] generateContractAddress(byte[] transactionRootId, long nonce) {
-    byte[] nonceBytes = Longs.toByteArray(nonce);
-    byte[] combined = new byte[transactionRootId.length + nonceBytes.length];
-    System.arraycopy(transactionRootId, 0, combined, 0, transactionRootId.length);
-    System.arraycopy(nonceBytes, 0, combined, transactionRootId.length, nonceBytes.length);
-
-    return Hash.sha3omit12(combined);
   }
 
   public static boolean isConstant(ABI abi, TriggerSmartContract triggerSmartContract)
