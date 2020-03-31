@@ -254,7 +254,7 @@ tasks.distTar.enabled = false
 
 createScript(project, 'org.tron.program.SolidityNode', 'SolidityNode')
 createScript(project, 'org.tron.program.FullNode', 'FullNode')
-createScript(project, 'org.tron.pro想`gram.KeystoreFactory', 'KeystoreFactory')
+createScript(project, 'org.tron.program.KeystoreFactory', 'KeystoreFactory')
 createScript(project, 'org.tron.program.DBConvert', 'DBConvert')
 
 artifacts {
