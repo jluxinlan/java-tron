@@ -7,7 +7,10 @@ import org.spongycastle.util.encoders.Hex;
 import org.testng.Assert;
 import org.tron.common.runtime.TVMTestResult;
 import org.tron.common.runtime.TvmTestUtils;
+<<<<<<< HEAD
 import org.tron.common.utils.StringUtil;
+=======
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.common.utils.WalletUtil;
 import org.tron.core.Wallet;
 import org.tron.core.exception.ContractExeException;
@@ -168,18 +171,30 @@ contract isTestCtr {
 
     // deploy contract
     Transaction trx = TvmTestUtils.generateDeploySmartContractAndGetTransaction(
+<<<<<<< HEAD
         contractName, address, ABI, factoryCode, value, fee, consumeUserResourcePercent,
         null);
     byte[] factoryAddress = WalletUtil.generateContractAddress(trx);
     String factoryAddressStr = StringUtil.encode58Check(factoryAddress);
+=======
+        contractName, address, ABI, factoryCode, value, fee, consumeUserResourcePercent, null);
+    byte[] factoryAddress = WalletUtil.generateContractAddress(trx);
+    String factoryAddressStr = WalletUtil.encode58Check(factoryAddress);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     runtime = TvmTestUtils.processTransactionAndReturnRuntime(trx, rootDeposit, null);
     Assert.assertNull(runtime.getRuntimeError());
 
     trx = TvmTestUtils.generateDeploySmartContractAndGetTransaction(
+<<<<<<< HEAD
         "", address, ABI, factoryCode, value, fee, consumeUserResourcePercent,
         null);
     byte[] factoryAddressOther = WalletUtil.generateContractAddress(trx);
     String factoryAddressStrOther = StringUtil.encode58Check(factoryAddressOther);
+=======
+        "", address, ABI, factoryCode, value, fee, consumeUserResourcePercent, null);
+    byte[] factoryAddressOther = WalletUtil.generateContractAddress(trx);
+    String factoryAddressStrOther = WalletUtil.encode58Check(factoryAddressOther);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     runtime = TvmTestUtils.processTransactionAndReturnRuntime(trx, rootDeposit, null);
     Assert.assertNull(runtime.getRuntimeError());
 
@@ -198,7 +213,11 @@ contract isTestCtr {
         "0000000000000000000000000000000000000000000000000000000000000000");
 
     // trigger deployed contract
+<<<<<<< HEAD
     String existentAccount = StringUtil.encode58Check(address);
+=======
+    String existentAccount = WalletUtil.encode58Check(address);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     hexInput = AbiUtil.parseMethod(methodByAddr, Arrays.asList(existentAccount));
     result = TvmTestUtils
         .triggerContractAndReturnTvmTestResult(Hex.decode(OWNER_ADDRESS),

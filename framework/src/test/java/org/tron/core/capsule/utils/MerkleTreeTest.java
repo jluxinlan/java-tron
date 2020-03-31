@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.tron.common.parameter.CommonParameter;
 import org.tron.common.utils.ByteArray;
+import org.tron.common.utils.DBConfig;
 import org.tron.common.utils.Sha256Hash;
 import org.tron.core.capsule.utils.MerkleTree.Leaf;
 
@@ -21,15 +22,23 @@ public class MerkleTreeTest {
       bytes[2] = (byte) ((i >> 8) & 0xFF);
       bytes[1] = (byte) ((i >> 16) & 0xFF);
       bytes[0] = (byte) ((i >> 24) & 0xFF);
+<<<<<<< HEAD
       hashList.add(Sha256Hash.of(CommonParameter
           .getInstance().isECKeyCryptoEngine(), bytes));
+=======
+      hashList.add(Sha256Hash.of(DBConfig.isECKeyCryptoEngine(), bytes));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
     return hashList;
   }
 
   private static Sha256Hash computeHash(Sha256Hash leftHash, Sha256Hash rightHash) {
+<<<<<<< HEAD
     return Sha256Hash.of(CommonParameter
             .getInstance().isECKeyCryptoEngine(),
+=======
+    return Sha256Hash.of(DBConfig.isECKeyCryptoEngine(),
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         leftHash.getByteString().concat(rightHash.getByteString()).toByteArray());
   }
 

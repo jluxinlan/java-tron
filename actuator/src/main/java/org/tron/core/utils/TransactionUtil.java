@@ -39,7 +39,6 @@ import org.tron.common.crypto.Hash;
 import org.tron.common.utils.Sha256Hash;
 import org.tron.core.ChainBaseManager;
 import org.tron.core.capsule.AccountCapsule;
-import org.tron.core.capsule.ContractCapsule;
 import org.tron.core.capsule.TransactionCapsule;
 import org.tron.core.exception.PermissionException;
 import org.tron.core.exception.SignatureFormatException;
@@ -54,6 +53,7 @@ import org.tron.protos.contract.SmartContractOuterClass.SmartContract;
 import org.tron.protos.contract.SmartContractOuterClass.SmartContract.ABI;
 import org.tron.protos.contract.SmartContractOuterClass.SmartContract.ABI.Entry.StateMutabilityType;
 import org.tron.protos.contract.SmartContractOuterClass.TriggerSmartContract;
+
 
 @Slf4j(topic = "capsule")
 @Component
@@ -166,13 +166,13 @@ public class TransactionUtil {
         transaction.getRawData().toByteArray());
   }
 
-
   public static contractResult getContractRet(Transaction transaction) {
     if (transaction.getRetCount() <= 0) {
       return null;
     }
     return transaction.getRet(0).getContractRet();
   }
+
 
   public static long getCallTokenValue(Transaction.Contract contract) {
     try {

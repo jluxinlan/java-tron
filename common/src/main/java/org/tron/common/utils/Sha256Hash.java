@@ -23,6 +23,8 @@ import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
+import org.spongycastle.crypto.digests.SM3Digest;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -150,8 +152,13 @@ public class Sha256Hash implements Serializable, Comparable<Sha256Hash> {
   }
 
   /**
+<<<<<<< HEAD
    * Returns a new SM3 MessageDigest instance. This is a convenience method which wraps the checked
    * exception that can never occur with a RuntimeException.
+=======
+   * Returns a new SM3 MessageDigest instance. This is a convenience method which wraps the
+   * checked exception that can never occur with a RuntimeException.
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
    *
    * @return a new SM3 MessageDigest instance
    */
@@ -290,7 +297,7 @@ public class Sha256Hash implements Serializable, Comparable<Sha256Hash> {
   public int hashCode() {
     // Use the last 4 bytes, not the first 4 which are often zeros in Bitcoin.
     return Ints
-        .fromBytes(bytes[LENGTH - 4], bytes[LENGTH - 3], bytes[LENGTH - 2], bytes[LENGTH - 1]);
+            .fromBytes(bytes[LENGTH - 4], bytes[LENGTH - 3], bytes[LENGTH - 2], bytes[LENGTH - 1]);
   }
 
   /**

@@ -1,11 +1,16 @@
 package org.tron.common.utils;
 
 
+import static org.tron.common.utils.StringUtil.encode58Check;
+
 import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
 import java.util.Arrays;
 import org.tron.common.crypto.Hash;
 import org.tron.common.parameter.CommonParameter;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.tron.core.capsule.ContractCapsule;
 import org.tron.core.capsule.TransactionCapsule;
 import org.tron.core.exception.ContractValidateException;
@@ -19,7 +24,7 @@ import org.tron.protos.contract.SmartContractOuterClass.SmartContract.ABI;
 import org.tron.protos.contract.SmartContractOuterClass.SmartContract.ABI.Entry.StateMutabilityType;
 import org.tron.protos.contract.SmartContractOuterClass.TriggerSmartContract;
 
-public class WalletUtil {
+  public class WalletUtil {
 
   public static boolean checkPermissionOperations(Permission permission, Contract contract)
       throws PermissionException {
@@ -32,7 +37,7 @@ public class WalletUtil {
     return b;
   }
 
-  public static byte[] generateContractAddress(Transaction trx) {
+    public static byte[] generateContractAddress(Transaction trx) {
 
     CreateSmartContract contract = ContractCapsule.getSmartContractFromTransaction(trx);
     byte[] ownerAddress = contract.getOwnerAddress().toByteArray();
@@ -54,6 +59,16 @@ public class WalletUtil {
     return Hash.sha3omit12(mergedData);
   }
 
+  // for `CREATE`
+  public static byte[] generateContractAddress(byte[] transactionRootId, long nonce) {
+    byte[] nonceBytes = Longs.toByteArray(nonce);
+    byte[] combined = new byte[transactionRootId.length + nonceBytes.length];
+    System.arraycopy(transactionRootId, 0, combined, 0, transactionRootId.length);
+    System.arraycopy(nonceBytes, 0, combined, transactionRootId.length, nonceBytes.length);
+
+    return Hash.sha3omit12(combined);
+  }
+
   public static boolean isConstant(ABI abi, TriggerSmartContract triggerSmartContract)
       throws ContractValidateException {
     try {
@@ -69,7 +84,7 @@ public class WalletUtil {
     }
   }
 
-  private static boolean isConstant(SmartContract.ABI abi, byte[] selector) {
+  public static boolean isConstant(SmartContract.ABI abi, byte[] selector) {
 
     if (selector == null || selector.length != 4
         || abi.getEntrysList().size() == 0) {
@@ -110,6 +125,11 @@ public class WalletUtil {
     return false;
   }
 
+  public static List<String> getAddressStringList(Collection<ByteString> collection) {
+    return collection.stream()
+      .map(bytes -> encode58Check(bytes.toByteArray()))
+      .collect(Collectors.toList());
+  }
 
   public static byte[] getSelector(byte[] data) {
     if (data == null ||

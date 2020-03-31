@@ -25,11 +25,15 @@ import org.tron.api.GrpcAPI.NodeList;
 import org.tron.api.GrpcAPI.TransactionList;
 import org.tron.api.GrpcAPI.WitnessList;
 import org.tron.common.crypto.ECKey;
+<<<<<<< HEAD
 import org.tron.common.parameter.CommonParameter;
 import org.tron.common.utils.ByteArray;
 import org.tron.common.utils.FileUtil;
 import org.tron.common.utils.Sha256Hash;
 import org.tron.common.utils.Utils;
+=======
+import org.tron.common.utils.*;
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.core.exception.CancelException;
 import org.tron.keystore.CipherException;
 import org.tron.protos.Protocol.Account;
@@ -533,10 +537,15 @@ public class WalletClient {
       return null;
     }
     byte[] pwd;
+<<<<<<< HEAD
     pwd = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), password.getBytes());
     pwd = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), pwd);
+=======
+    pwd = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),password.getBytes());
+    pwd = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),pwd);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     pwd = Arrays.copyOfRange(pwd, 0, 16);
     return pwd;
   }
@@ -550,8 +559,12 @@ public class WalletClient {
       return null;
     }
     byte[] encKey;
+<<<<<<< HEAD
     encKey = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), password.getBytes());
+=======
+    encKey = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),password.getBytes());
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     encKey = Arrays.copyOfRange(encKey, 0, 16);
     return encKey;
   }
@@ -617,16 +630,42 @@ public class WalletClient {
    */
 
   public static String encode58Check(byte[] input) {
+<<<<<<< HEAD
     byte[] hash0 = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), input);
     byte[] hash1 = Sha256Hash.hash(CommonParameter
         .getInstance().isECKeyCryptoEngine(), hash0);
+=======
+    byte[] hash0 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),input);
+    byte[] hash1 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),hash0);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     byte[] inputCheck = new byte[input.length + 4];
     System.arraycopy(input, 0, inputCheck, 0, input.length);
     System.arraycopy(hash1, 0, inputCheck, input.length, 4);
     return Base58.encode(inputCheck);
   }
 
+<<<<<<< HEAD
+=======
+  private static byte[] decode58Check(String input) {
+    byte[] decodeCheck = Base58.decode(input);
+    if (decodeCheck.length <= 4) {
+      return null;
+    }
+    byte[] decodeData = new byte[decodeCheck.length - 4];
+    System.arraycopy(decodeCheck, 0, decodeData, 0, decodeData.length);
+    byte[] hash0 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),decodeData);
+    byte[] hash1 = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),hash0);
+    if (hash1[0] == decodeCheck[decodeData.length]
+        && hash1[1] == decodeCheck[decodeData.length + 1]
+        && hash1[2] == decodeCheck[decodeData.length + 2]
+        && hash1[3] == decodeCheck[decodeData.length + 3]) {
+      return decodeData;
+    }
+    return null;
+  }
+
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   /**
    * constructor.
    */

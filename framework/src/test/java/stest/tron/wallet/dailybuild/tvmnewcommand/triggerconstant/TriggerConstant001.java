@@ -135,8 +135,13 @@ public class TriggerConstant001 {
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
         containsString("SUCCESS"));
+<<<<<<< HEAD
     //Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
     //    containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+=======
+    /*Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));*/
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   @Test(enabled = true, description = "TriggerConstantContract a payable function"
@@ -150,8 +155,13 @@ public class TriggerConstant001 {
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
         containsString("SUCCESS"));
+<<<<<<< HEAD
     //Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
     //    containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+=======
+    /*Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));*/
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   @Test(enabled = true, description = "TriggerConstantContract a payable function"
@@ -165,8 +175,13 @@ public class TriggerConstant001 {
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
         containsString("SUCCESS"));
+<<<<<<< HEAD
     //Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
     //    containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+=======
+    /*Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));*/
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   @Test(enabled = true, description = "TriggerConstantContract a non-payable function"
@@ -181,8 +196,13 @@ public class TriggerConstant001 {
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
         containsString("SUCCESS"));
+<<<<<<< HEAD
     //Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
     //    containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+=======
+    /*Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));*/
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   @Test(enabled = true, description = "TriggerConstantContract a non-payable function"
@@ -196,8 +216,13 @@ public class TriggerConstant001 {
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
         containsString("SUCCESS"));
+<<<<<<< HEAD
     //Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
     //    containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+=======
+    /*Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));*/
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   @Test(enabled = true, description = "TriggerConstantContract a non-payable function"
@@ -211,8 +236,13 @@ public class TriggerConstant001 {
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
         containsString("SUCCESS"));
+<<<<<<< HEAD
     //Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
     //    containsString("Attempt to call a state modifying opcode inside STATICCALL"));
+=======
+    /*Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));*/
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   @Test(enabled = true, description = "TriggerConstantContract a view function without ABI")
@@ -343,9 +373,16 @@ public class TriggerConstant001 {
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
         containsString("SUCCESS"));
+<<<<<<< HEAD
     //Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
     //    containsString("Attempt to call a state modifying opcode inside STATICCALL"));
     //PublicMethed.waitProduceNextBlock(blockingStubFull);
+=======
+    /*Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));*/
+    PublicMethed.waitProduceNextBlock(blockingStubFull);
+
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
   }
 
@@ -360,9 +397,15 @@ public class TriggerConstant001 {
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
         containsString("SUCCESS"));
+<<<<<<< HEAD
     //Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
     //    containsString("Attempt to call a state modifying opcode inside STATICCALL"));
     //PublicMethed.waitProduceNextBlock(blockingStubFull);
+=======
+    /*Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));*/
+    PublicMethed.waitProduceNextBlock(blockingStubFull);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   @Test(enabled = true, description = "TriggerConstantContract a payable function"
@@ -376,9 +419,15 @@ public class TriggerConstant001 {
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
         containsString("SUCCESS"));
+<<<<<<< HEAD
     //Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
     //    containsString("Attempt to call a state modifying opcode inside STATICCALL"));
     //PublicMethed.waitProduceNextBlock(blockingStubFull);
+=======
+    /*Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));*/
+    PublicMethed.waitProduceNextBlock(blockingStubFull);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   @Test(enabled = true, description = "TriggerConstantContract a non-payable function with ABI")
@@ -392,9 +441,16 @@ public class TriggerConstant001 {
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
         containsString("SUCCESS"));
+<<<<<<< HEAD
     //Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
     //    containsString("Attempt to call a state modifying opcode inside STATICCALL"));
     //PublicMethed.waitProduceNextBlock(blockingStubFull);
+=======
+    /*Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));*/
+    PublicMethed.waitProduceNextBlock(blockingStubFull);
+
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
   }
 
@@ -409,9 +465,15 @@ public class TriggerConstant001 {
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
         containsString("SUCCESS"));
+<<<<<<< HEAD
     //Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
     //    containsString("Attempt to call a state modifying opcode inside STATICCALL"));
     //PublicMethed.waitProduceNextBlock(blockingStubFull);
+=======
+    /*Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));*/
+    PublicMethed.waitProduceNextBlock(blockingStubFull);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   @Test(enabled = true, description = "TriggerConstantContract a non-payable function"
@@ -425,9 +487,15 @@ public class TriggerConstant001 {
 
     Assert.assertThat(transactionExtention.getResult().getCode().toString(),
         containsString("SUCCESS"));
+<<<<<<< HEAD
     //Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
     //    containsString("Attempt to call a state modifying opcode inside STATICCALL"));
     //PublicMethed.waitProduceNextBlock(blockingStubFull);
+=======
+    /*Assert.assertThat(transactionExtention.getResult().getMessage().toStringUtf8(),
+        containsString("Attempt to call a state modifying opcode inside STATICCALL"));*/
+    PublicMethed.waitProduceNextBlock(blockingStubFull);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   @Test(enabled = true, description = "TriggerConstantContract a view function with ABI")

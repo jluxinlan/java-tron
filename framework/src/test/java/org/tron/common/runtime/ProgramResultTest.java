@@ -18,6 +18,7 @@ import org.tron.common.application.TronApplicationContext;
 import org.tron.common.runtime.vm.DataWord;
 import org.tron.common.storage.DepositImpl;
 import org.tron.common.utils.FileUtil;
+import org.tron.common.utils.WalletUtil;
 import org.tron.core.Constant;
 import org.tron.core.Wallet;
 import org.tron.core.capsule.BlockCapsule;
@@ -338,7 +339,11 @@ public class ProgramResultTest {
     TransactionTrace traceFailed = TvmTestUtils
         .processTransactionAndReturnTrace(trx2, deposit, null);
     runtime = traceFailed.getRuntime();
+<<<<<<< HEAD
     byte[] bContract2 = TransactionUtil
+=======
+    byte[] bContract2 = WalletUtil
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         .generateContractAddress(new TransactionCapsule(trx2).getTransactionId().getBytes(), 0);
     List<InternalTransaction> internalTransactionsListFail = runtime.getResult()
         .getInternalTransactions();

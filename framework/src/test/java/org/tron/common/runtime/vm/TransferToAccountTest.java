@@ -19,7 +19,11 @@ import org.tron.common.utils.ByteArray;
 import org.tron.common.utils.FileUtil;
 import org.tron.common.utils.StringUtil;
 import org.tron.common.utils.Utils;
+<<<<<<< HEAD
 import org.tron.core.ChainBaseManager;
+=======
+import org.tron.common.utils.WalletUtil;
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.core.Constant;
 import org.tron.core.Wallet;
 import org.tron.core.actuator.VMActuator;
@@ -163,7 +167,11 @@ public class TransferToAccountTest {
 
     byte[] input = Hex.decode(AbiUtil
         .parseMethod(selectorStr,
+<<<<<<< HEAD
             "\"" + StringUtil.encode58Check(Hex.decode(TRANSFER_TO)) + "\"" + "," + id + ",9"));
+=======
+            "\"" + WalletUtil.encode58Check(Hex.decode(TRANSFER_TO)) + "\"" + "," + id + ",9"));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
     //  2. Test trigger with tokenValue and tokenId,
     //  also test internal transaction transferToken function */
@@ -189,7 +197,11 @@ public class TransferToAccountTest {
     ECKey ecKey = new ECKey(Utils.getRandom());
     input = Hex.decode(AbiUtil
         .parseMethod(selectorStr,
+<<<<<<< HEAD
             "\"" + StringUtil.encode58Check(ecKey.getAddress()) + "\"" + "," + id + ",9"));
+=======
+            "\"" + WalletUtil.encode58Check(ecKey.getAddress()) + "\"" + "," + id + ",9"));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     transaction = TvmTestUtils
         .generateTriggerSmartContractAndGetTransaction(Hex.decode(OWNER_ADDRESS), contractAddress,
             input,
@@ -212,7 +224,11 @@ public class TransferToAccountTest {
     selectorStr = "transferTo(address,uint256)";
     input = Hex.decode(AbiUtil
         .parseMethod(selectorStr,
+<<<<<<< HEAD
             "\"" + StringUtil.encode58Check(Hex.decode(TRANSFER_TO)) + "\"" + ",9"));
+=======
+            "\"" + WalletUtil.encode58Check(Hex.decode(TRANSFER_TO)) + "\"" + ",9"));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     transaction = TvmTestUtils
         .generateTriggerSmartContractAndGetTransaction(Hex.decode(OWNER_ADDRESS), contractAddress,
             input,
@@ -228,7 +244,11 @@ public class TransferToAccountTest {
     ecKey = new ECKey(Utils.getRandom());
     input = Hex.decode(AbiUtil
         .parseMethod(selectorStr,
+<<<<<<< HEAD
             "\"" + StringUtil.encode58Check(ecKey.getAddress()) + "\"" + ",9"));
+=======
+            "\"" + WalletUtil.encode58Check(ecKey.getAddress()) + "\"" + ",9"));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     transaction = TvmTestUtils
         .generateTriggerSmartContractAndGetTransaction(Hex.decode(OWNER_ADDRESS), contractAddress,
             input,
@@ -247,7 +267,11 @@ public class TransferToAccountTest {
     selectorStr = "transferTo(address,uint256)";
     input = Hex.decode(AbiUtil
         .parseMethod(selectorStr,
+<<<<<<< HEAD
             "\"" + StringUtil.encode58Check(contractAddress) + "\"" + ",9"));
+=======
+            "\"" + WalletUtil.encode58Check(contractAddress) + "\"" + ",9"));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     transaction = TvmTestUtils
         .generateTriggerSmartContractAndGetTransaction(Hex.decode(OWNER_ADDRESS), contractAddress,
             input,
@@ -277,7 +301,11 @@ public class TransferToAccountTest {
     ecKey = new ECKey(Utils.getRandom());
     input = Hex.decode(AbiUtil
         .parseMethod(selectorStr,
+<<<<<<< HEAD
             "\"" + StringUtil.encode58Check(ecKey.getAddress()) + "\"" + ",1"));
+=======
+            "\"" + WalletUtil.encode58Check(ecKey.getAddress()) + "\"" + ",1"));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     transaction = TvmTestUtils
         .generateTriggerSmartContractAndGetTransaction(Hex.decode(OWNER_ADDRESS), contractAddress,
             input,

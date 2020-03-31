@@ -11,8 +11,15 @@ import org.tron.common.runtime.TVMTestResult;
 import org.tron.common.runtime.TvmTestUtils;
 import org.tron.common.storage.Deposit;
 import org.tron.common.storage.DepositImpl;
+<<<<<<< HEAD
 import org.tron.common.utils.WalletUtil;
 import org.tron.core.config.Parameter.ForkBlockVersionConsts;
+=======
+import org.tron.common.utils.DBConfig;
+import org.tron.common.utils.WalletUtil;
+import org.tron.core.Wallet;
+import org.tron.core.config.args.Parameter.ForkBlockVersionConsts;
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.core.exception.ContractExeException;
 import org.tron.core.exception.ContractValidateException;
 import org.tron.core.exception.ReceiptCheckErrException;

@@ -20,6 +20,7 @@ import org.tron.api.WalletGrpc;
 import org.tron.common.crypto.ECKey;
 import org.tron.common.parameter.CommonParameter;
 import org.tron.common.utils.ByteArray;
+import org.tron.common.utils.DBConfig;
 import org.tron.common.utils.Utils;
 import org.tron.core.Wallet;
 import org.tron.protos.Protocol;
@@ -305,8 +306,12 @@ public class TransferAssetIssue {
       Long currentNum = currentBlock.getBlockHeader().getRawData().getNumber();
       for (Integer m = 0; m < currentBlock.getTransactionsCount(); m++) {
         logger.info(currentBlock.getTransactions(m).getRetList().toString());
+<<<<<<< HEAD
         String txId = ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), currentBlock.getTransactions(m)
+=======
+        String txId = ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),currentBlock.getTransactions(m)
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
             .getRawData().toByteArray()));
         ByteString bsTxid = ByteString.copyFrom(ByteArray.fromHexString(txId));
         BytesMessage request = BytesMessage.newBuilder().setValue(bsTxid).build();

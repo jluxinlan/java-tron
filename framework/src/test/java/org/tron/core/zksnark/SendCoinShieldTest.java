@@ -20,11 +20,15 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.testng.collections.Lists;
 import org.tron.api.GrpcAPI;
 import org.tron.common.application.TronApplicationContext;
+<<<<<<< HEAD
 import org.tron.common.parameter.CommonParameter;
 import org.tron.common.utils.ByteArray;
 import org.tron.common.utils.ByteUtil;
 import org.tron.common.utils.FileUtil;
 import org.tron.common.utils.Sha256Hash;
+=======
+import org.tron.common.utils.*;
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.common.zksnark.IncrementalMerkleTreeContainer;
 import org.tron.common.zksnark.IncrementalMerkleTreeContainer.EmptyMerkleRoots;
 import org.tron.common.zksnark.IncrementalMerkleVoucherContainer;
@@ -68,6 +72,7 @@ import org.tron.core.exception.VMIllegalException;
 import org.tron.core.exception.ValidateSignatureException;
 import org.tron.core.exception.ZksnarkException;
 import org.tron.core.services.http.FullNodeHttpApiService;
+import org.tron.core.utils.TransactionUtil;
 import org.tron.core.zen.ZenTransactionBuilder;
 import org.tron.core.zen.ZenTransactionBuilder.SpendDescriptionInfo;
 import org.tron.core.zen.address.DiversifierT;
@@ -627,8 +632,12 @@ public class SendCoinShieldTest {
   }
 
   private byte[] getHash() {
+<<<<<<< HEAD
     return Sha256Hash.of(CommonParameter
         .getInstance().isECKeyCryptoEngine(), "this is a test".getBytes()).getBytes();
+=======
+    return Sha256Hash.of(DBConfig.isECKeyCryptoEngine(),"this is a test".getBytes()).getBytes();
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   }
 
   public void checkZksnark() throws BadItemException, ZksnarkException {
@@ -658,7 +667,11 @@ public class SendCoinShieldTest {
     TransactionCapsule transactionCap = builder.build();
     JLibrustzcash.librustzcashSaplingProvingCtxFree(ctx);
     boolean ret = ZksnarkClient.getInstance().checkZksnarkProof(transactionCap.getInstance(),
+<<<<<<< HEAD
         getShieldTransactionHashIgnoreTypeException(transactionCap.getInstance()),
+=======
+        TransactionUtil.getShieldTransactionHashIgnoreTypeException(transactionCap.getInstance()),
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         10 * 1000000);
     Assert.assertTrue(ret);
   }

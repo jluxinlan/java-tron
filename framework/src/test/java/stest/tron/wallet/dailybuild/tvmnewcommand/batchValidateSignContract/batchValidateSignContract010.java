@@ -21,6 +21,7 @@ import org.tron.common.crypto.Hash;
 import org.tron.common.utils.ByteArray;
 import org.tron.common.utils.StringUtil;
 import org.tron.common.utils.Utils;
+import org.tron.common.utils.WalletUtil;
 import org.tron.core.Wallet;
 import stest.tron.wallet.common.client.Configuration;
 import stest.tron.wallet.common.client.Parameter;
@@ -89,7 +90,11 @@ public class batchValidateSignContract010 {
       ECKey key = new ECKey();
       byte[] sign = key.sign(hash).toByteArray();
       signatures.add(Hex.toHexString(sign));
+<<<<<<< HEAD
       addresses.add(StringUtil.encode58Check(key.getAddress()));
+=======
+      addresses.add(WalletUtil.encode58Check(key.getAddress()));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
     List<Object> parameters = Arrays.asList("0x" + Hex.toHexString(hash), signatures, addresses);
     String input = PublicMethed.parametersString(parameters);
@@ -121,7 +126,11 @@ public class batchValidateSignContract010 {
       ECKey key = new ECKey();
       byte[] sign = key.sign(hash).toByteArray();
       signatures.add(Hex.toHexString(sign));
+<<<<<<< HEAD
       addresses.add(StringUtil.encode58Check(key.getAddress()));
+=======
+      addresses.add(WalletUtil.encode58Check(key.getAddress()));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
     byte[] sign = new ECKey().sign(Hash.sha3("sdifhsdfihyw888w7".getBytes())).toByteArray();
     signatures.set(0, Hex.toHexString(sign));
@@ -155,9 +164,15 @@ public class batchValidateSignContract010 {
       ECKey key = new ECKey();
       byte[] sign = key.sign(hash).toByteArray();
       signatures.add(Hex.toHexString(sign));
+<<<<<<< HEAD
       addresses.add(StringUtil.encode58Check(key.getAddress()));
     }
     addresses.set(0, StringUtil.encode58Check(new ECKey().getAddress()));
+=======
+      addresses.add(WalletUtil.encode58Check(key.getAddress()));
+    }
+    addresses.set(0, WalletUtil.encode58Check(new ECKey().getAddress()));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     List<Object> parameters = Arrays.asList("0x" + Hex.toHexString(hash), signatures, addresses);
     String input = PublicMethed.parametersString(parameters);
     TransactionExtention transactionExtention = PublicMethed
@@ -188,7 +203,11 @@ public class batchValidateSignContract010 {
       ECKey key = new ECKey();
       byte[] sign = key.sign(hash).toByteArray();
       signatures.add(Hex.toHexString(sign));
+<<<<<<< HEAD
       addresses.add(StringUtil.encode58Check(key.getAddress()));
+=======
+      addresses.add(WalletUtil.encode58Check(key.getAddress()));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
     byte[] sign = new ECKey().sign(Hash.sha3("sdifhsdfihyw888w7".getBytes())).toByteArray();
     signatures.set(6, Hex.toHexString(sign));
@@ -222,10 +241,17 @@ public class batchValidateSignContract010 {
       ECKey key = new ECKey();
       byte[] sign = key.sign(hash).toByteArray();
       signatures.add(Hex.toHexString(sign));
+<<<<<<< HEAD
       addresses.add(StringUtil.encode58Check(key.getAddress()));
     }
     for (int i = 1; i < 4; i++) {
       addresses.set(i, StringUtil.encode58Check(new ECKey().getAddress()));
+=======
+      addresses.add(WalletUtil.encode58Check(key.getAddress()));
+    }
+    for (int i = 1; i < 4; i++) {
+      addresses.set(i, WalletUtil.encode58Check(new ECKey().getAddress()));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
     List<Object> parameters = Arrays.asList("0x" + Hex.toHexString(hash), signatures, addresses);
     String input = PublicMethed.parametersString(parameters);
@@ -262,7 +288,11 @@ public class batchValidateSignContract010 {
       } else {
         signatures.add(Hex.toHexString(sign));
       }
+<<<<<<< HEAD
       addresses.add(StringUtil.encode58Check(key.getAddress()));
+=======
+      addresses.add(WalletUtil.encode58Check(key.getAddress()));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
     List<Object> parameters = Arrays.asList("0x" + Hex.toHexString(hash), signatures, addresses);
     String input = PublicMethed.parametersString(parameters);
@@ -294,12 +324,21 @@ public class batchValidateSignContract010 {
       ECKey key = new ECKey();
       byte[] sign = key.sign(hash).toByteArray();
       signatures.add(Hex.toHexString(sign));
+<<<<<<< HEAD
       addresses.add(StringUtil.encode58Check(key.getAddress()));
     }
     addresses.set(8, StringUtil.encode58Check(new ECKey().getAddress()));
     addresses.set(10, StringUtil.encode58Check(new ECKey().getAddress()));
     addresses.set(27, StringUtil.encode58Check(new ECKey().getAddress()));
     addresses.set(31, StringUtil.encode58Check(new ECKey().getAddress()));
+=======
+      addresses.add(WalletUtil.encode58Check(key.getAddress()));
+    }
+    addresses.set(8, WalletUtil.encode58Check(new ECKey().getAddress()));
+    addresses.set(10, WalletUtil.encode58Check(new ECKey().getAddress()));
+    addresses.set(27, WalletUtil.encode58Check(new ECKey().getAddress()));
+    addresses.set(31, WalletUtil.encode58Check(new ECKey().getAddress()));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     List<Object> parameters = Arrays.asList("0x" + Hex.toHexString(hash), signatures, addresses);
     String input = PublicMethed.parametersString(parameters);
     TransactionExtention transactionExtention = PublicMethed
@@ -333,7 +372,11 @@ public class batchValidateSignContract010 {
       ECKey key = new ECKey();
       byte[] sign = key.sign(hash).toByteArray();
       signatures.add(Hex.toHexString(sign));
+<<<<<<< HEAD
       addresses.add(StringUtil.encode58Check(key.getAddress()));
+=======
+      addresses.add(WalletUtil.encode58Check(key.getAddress()));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     }
     List<Object> parameters = Arrays
         .asList("0x" + Hex.toHexString(Hash.sha3(incorrecttxid.getBytes())), signatures, addresses);

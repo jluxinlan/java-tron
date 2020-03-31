@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.tron.common.args.GenesisBlock;
 import org.tron.common.parameter.CommonParameter;
 import org.tron.common.utils.ByteArray;
+import org.tron.common.utils.DBConfig;
 import org.tron.core.Constant;
 
 @Slf4j
@@ -94,8 +95,12 @@ public class ArgsTest {
     Assert.assertEquals("f31db24bfbd1a2ef19beddca0a0fa37632eded9ac666a05d3bd925f01dde1f62",
         Args.getLocalWitnesses().getPrivateKey());
     Assert.assertEquals("a0299f3db80a24b20a254b89ce639d59132f157f13",
+<<<<<<< HEAD
         ByteArray.toHexString(Args.getLocalWitnesses()
             .getWitnessAccountAddress(CommonParameter.getInstance().isECKeyCryptoEngine())));
+=======
+        ByteArray.toHexString(args.getLocalWitnesses().getWitnessAccountAddress(DBConfig.isECKeyCryptoEngine())));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 
 
   }

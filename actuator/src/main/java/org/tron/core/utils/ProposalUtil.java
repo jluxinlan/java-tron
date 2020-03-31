@@ -271,9 +271,10 @@ public class ProposalUtil {
           throw new ContractValidateException(
               "Shielded Transaction is not activated, can not set Shielded Transaction fee");
         }
-        if (value < 0 || value > 10_000_000_000L) {
+        if (dynamicPropertiesStore.getAllowCreationOfContracts() == 0) {
           throw new ContractValidateException(
-              "Bad SHIELD_TRANSACTION_FEE parameter value, valid range is [0,10_000_000_000L]");
+              "[ALLOW_CREATION_OF_CONTRACTS] proposal must be approved "
+                  + "before [FORBID_TRANSFER_TO_CONTRACT] can be proposed");
         }
         break;
       }
@@ -309,8 +310,7 @@ public class ProposalUtil {
     }
   }
 
-  public enum ProposalType {
-                                  // current value, value range
+  public enum ProposalType {         // current value, value range
     MAINTENANCE_TIME_INTERVAL(0), // 6 Hours, [3 * 27, 24 * 3600] s
     ACCOUNT_UPGRADE_COST(1), // 9999 TRX, [0, 100000000000] TRX
     CREATE_ACCOUNT_FEE(2), // 0.1 TRX, [0, 100000000000] TRX

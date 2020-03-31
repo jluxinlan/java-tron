@@ -1,6 +1,6 @@
 package org.tron.core.vm.utils;
 
-import org.tron.common.utils.DecodeUtil;
+import static org.tron.common.utils.DecodeUtil.addressPreFixByte;
 import org.tron.core.capsule.AccountCapsule;
 import org.tron.core.exception.ContractValidateException;
 import org.tron.core.vm.VMUtils;
@@ -47,12 +47,14 @@ public class MUtil {
     deposit.addTokenBalance(fromAddress, tokenId.getBytes(), -amount);
   }
 
-  public static boolean isNullOrEmpty(String str) {
-    return (str == null) || str.isEmpty();
-  }
-
-
-  public static boolean isNotNullOrEmpty(String str) {
-    return !isNullOrEmpty(str);
+  public static byte[] convertToTronAddress(byte[] address) {
+    if (address.length == 20) {
+      byte[] newAddress = new byte[21];
+      byte[] temp = new byte[]{addressPreFixByte};
+      System.arraycopy(temp, 0, newAddress, 0, temp.length);
+      System.arraycopy(address, 0, newAddress, temp.length, address.length);
+      address = newAddress;
+    }
+    return address;
   }
 }

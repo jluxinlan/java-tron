@@ -12,6 +12,10 @@ import org.tron.common.runtime.ProgramResult;
 import org.tron.common.runtime.TVMTestResult;
 import org.tron.common.runtime.TvmTestUtils;
 import org.tron.common.utils.WalletUtil;
+<<<<<<< HEAD
+=======
+import org.tron.core.Wallet;
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.core.capsule.ReceiptCapsule;
 import org.tron.core.exception.ContractExeException;
 import org.tron.core.exception.ContractValidateException;
@@ -279,8 +283,12 @@ public class TransferFailedEnergyTest extends VMTestBase {
 
     // deploy contract
     Transaction trx = TvmTestUtils.generateDeploySmartContractAndGetTransaction(
+<<<<<<< HEAD
         contractName, address, ABI, code, value, fee, consumeUserResourcePercent,
         null);
+=======
+        contractName, address, ABI, code, value, fee, consumeUserResourcePercent, null);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     byte[] addressWithSufficientBalance = WalletUtil.generateContractAddress(trx);
     runtime = TvmTestUtils.processTransactionAndReturnRuntime(trx, rootDeposit, null);
     Assert.assertNull(runtime.getRuntimeError());
@@ -290,8 +298,12 @@ public class TransferFailedEnergyTest extends VMTestBase {
     }
 
     trx = TvmTestUtils.generateDeploySmartContractAndGetTransaction(
+<<<<<<< HEAD
         contractName, address, ABI, code, 0, fee, consumeUserResourcePercent,
         null);
+=======
+        contractName, address, ABI, code, 0, fee, consumeUserResourcePercent, null);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     byte[] addressWithoutBalance = WalletUtil.generateContractAddress(trx);
     runtime = TvmTestUtils.processTransactionAndReturnRuntime(trx, rootDeposit, null);
     Assert.assertNull(runtime.getRuntimeError());
@@ -351,8 +363,12 @@ public class TransferFailedEnergyTest extends VMTestBase {
 
     // deploy contract
     Transaction trx = TvmTestUtils.generateDeploySmartContractAndGetTransaction(
+<<<<<<< HEAD
         contractName, address, ABI, code, value, fee, consumeUserResourcePercent,
         null);
+=======
+        contractName, address, ABI, code, value, fee, consumeUserResourcePercent, null);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     byte[] addressWithSufficientBalance = WalletUtil.generateContractAddress(trx);
     runtime = TvmTestUtils.processTransactionAndReturnRuntime(trx, rootDeposit, null);
     Assert.assertNull(runtime.getRuntimeError());
@@ -362,8 +378,12 @@ public class TransferFailedEnergyTest extends VMTestBase {
     }
 
     trx = TvmTestUtils.generateDeploySmartContractAndGetTransaction(
+<<<<<<< HEAD
         contractName, address, ABI, code, 0, fee, consumeUserResourcePercent,
         null);
+=======
+        contractName, address, ABI, code, 0, fee, consumeUserResourcePercent, null);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     byte[] addressWithoutBalance = WalletUtil.generateContractAddress(trx);
     runtime = TvmTestUtils.processTransactionAndReturnRuntime(trx, rootDeposit, null);
     Assert.assertNull(runtime.getRuntimeError());

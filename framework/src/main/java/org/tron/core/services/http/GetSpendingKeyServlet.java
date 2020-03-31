@@ -1,5 +1,6 @@
 package org.tron.core.services.http;
 
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +23,12 @@ public class GetSpendingKeyServlet extends RateLimiterServlet {
       boolean visible = Util.getVisible(request);
       BytesMessage reply = wallet.getSpendingKey();
 
+<<<<<<< HEAD
       String base58check = StringUtil.encode58Check(reply.toByteArray());
       String hexString = ByteArray.toHexString(reply.toByteArray());
       System.out.println("b58 is: " + base58check + ", hex is: " + hexString);
+=======
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
       response.getWriter().println(JsonFormat.printToString(reply, visible));
     } catch (Exception e) {
       Util.processError(e, response);
@@ -33,7 +37,11 @@ public class GetSpendingKeyServlet extends RateLimiterServlet {
 
   protected void doPost(HttpServletRequest request, HttpServletResponse response) {
     try {
-      boolean visible = Util.getVisible(request);
+      String input = request.getReader().lines()
+          .collect(Collectors.joining(System.lineSeparator()));
+      Util.checkBodySize(input);
+      boolean visible = Util.getVisiblePost(input);
+
       BytesMessage reply = wallet.getSpendingKey();
       if (reply != null) {
         response.getWriter().println(JsonFormat.printToString(reply, visible));

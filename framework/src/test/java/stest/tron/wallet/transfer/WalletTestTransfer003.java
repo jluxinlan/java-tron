@@ -22,6 +22,7 @@ import org.tron.api.WalletSolidityGrpc;
 import org.tron.common.crypto.ECKey;
 import org.tron.common.parameter.CommonParameter;
 import org.tron.common.utils.ByteArray;
+import org.tron.common.utils.DBConfig;
 import org.tron.common.utils.Utils;
 import org.tron.core.Wallet;
 import org.tron.protos.Protocol;
@@ -193,8 +194,12 @@ public class WalletTestTransfer003 {
       if (times++ < 1) {
         PublicMethed.waitProduceNextBlock(blockingStubFull);
         //PublicMethed.waitSolidityNodeSynFullNodeData(blockingStubFull,blockingStubSolidity);
+<<<<<<< HEAD
         String txId = ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
             .isECKeyCryptoEngine(), sendCoinTransaction
+=======
+        String txId = ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),sendCoinTransaction
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
             .getRawData().toByteArray()));
         logger.info(txId);
         ByteString bsTxid = ByteString.copyFrom(ByteArray.fromHexString(txId));
@@ -220,8 +225,12 @@ public class WalletTestTransfer003 {
         testKeyForSendCoin, blockingStubFull);
     PublicMethed.waitProduceNextBlock(blockingStubFull);
     //PublicMethed.waitSolidityNodeSynFullNodeData(blockingStubFull,blockingStubSolidity);
+<<<<<<< HEAD
     String txId = ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), sendCoinTransaction
+=======
+    String txId = ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),sendCoinTransaction
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         .getRawData().toByteArray()));
     logger.info(txId);
     ByteString bsTxid = ByteString.copyFrom(ByteArray.fromHexString(txId));
@@ -245,8 +254,12 @@ public class WalletTestTransfer003 {
         testKeyForSendCoin, blockingStubFull);
     PublicMethed.waitProduceNextBlock(blockingStubFull);
     //PublicMethed.waitSolidityNodeSynFullNodeData(blockingStubFull,blockingStubSolidity);
+<<<<<<< HEAD
     String txId = ByteArray.toHexString(Sha256Hash.hash(CommonParameter.getInstance()
         .isECKeyCryptoEngine(), sendCoinTransaction
+=======
+    String txId = ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),sendCoinTransaction
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
         .getRawData().toByteArray()));
     logger.info(txId);
     ByteString bsTxid = ByteString.copyFrom(ByteArray.fromHexString(txId));

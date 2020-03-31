@@ -12,6 +12,10 @@ import org.testng.Assert;
 import org.tron.common.runtime.TVMTestResult;
 import org.tron.common.runtime.TvmTestUtils;
 import org.tron.common.utils.WalletUtil;
+<<<<<<< HEAD
+=======
+import org.tron.core.Wallet;
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 import org.tron.core.exception.ContractExeException;
 import org.tron.core.exception.ContractValidateException;
 import org.tron.core.exception.ReceiptCheckErrException;
@@ -141,8 +145,12 @@ public class Create2Test extends VMTestBase {
 
     // deploy contract
     Transaction trx = TvmTestUtils.generateDeploySmartContractAndGetTransaction(
+<<<<<<< HEAD
         contractName, address, ABI, factoryCode, value, fee, consumeUserResourcePercent,
         null);
+=======
+        contractName, address, ABI, factoryCode, value, fee, consumeUserResourcePercent, null);
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     byte[] factoryAddress = WalletUtil.generateContractAddress(trx);
     runtime = TvmTestUtils.processTransactionAndReturnRuntime(trx, rootDeposit, null);
     Assert.assertNull(runtime.getRuntimeError());
@@ -156,10 +164,16 @@ public class Create2Test extends VMTestBase {
     Assert.assertNull(result.getRuntime().getRuntimeError());
 
     byte[] returnValue = result.getRuntime().getResult().getHReturn();
+<<<<<<< HEAD
     byte[] actualContract = convertToTronAddress(Arrays.copyOfRange(returnValue,
         12, 32));
     byte[] expectedContract =
         generateContractAddress2(address, new DataWord(salt).getData(), Hex.decode(testCode));
+=======
+    byte[] actualContract = MUtil.convertToTronAddress(Arrays.copyOfRange(returnValue, 12, 32));
+    byte[] expectedContract = WalletUtil
+        .generateContractAddress2(address, new DataWord(salt).getData(), Hex.decode(testCode));
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
     // check deployed contract
     Assert.assertEquals(actualContract, expectedContract);
 

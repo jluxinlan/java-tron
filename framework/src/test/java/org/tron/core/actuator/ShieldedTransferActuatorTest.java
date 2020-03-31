@@ -312,7 +312,6 @@ public class ShieldedTransferActuatorTest {
       Assert.assertTrue(e instanceof ValidateSignatureException);
       Assert.assertEquals("miss sig or contract", e.getMessage());
     } catch (Exception e) {
-      Assert.assertTrue(false);
     }
   }
 
@@ -1340,7 +1339,10 @@ public class ShieldedTransferActuatorTest {
       Assert.assertTrue(false);
     }
   }
+<<<<<<< HEAD
 
+=======
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
   /**
    * success
    */
@@ -1387,4 +1389,9 @@ public class ShieldedTransferActuatorTest {
       Assert.assertTrue(false);
     }
   }
+<<<<<<< HEAD
+=======
+
+>>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
 }
+
