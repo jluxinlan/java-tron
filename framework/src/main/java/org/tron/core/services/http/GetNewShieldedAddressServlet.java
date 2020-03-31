@@ -29,14 +29,10 @@ public class GetNewShieldedAddressServlet extends RateLimiterServlet {
 
   protected void doPost(HttpServletRequest request, HttpServletResponse response) {
     try {
-      boolean visible = Util.getVisible(request);
-=======
       String input = request.getReader().lines()
           .collect(Collectors.joining(System.lineSeparator()));
       Util.checkBodySize(input);
       boolean visible = Util.getVisiblePost(input);
-
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
       ShieldedAddressInfo reply = wallet.getNewShieldedAddress();
       if (reply != null) {
         response.getWriter().println(JsonFormat.printToString(reply, visible));

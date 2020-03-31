@@ -22,13 +22,6 @@ public class GetSpendingKeyServlet extends RateLimiterServlet {
     try {
       boolean visible = Util.getVisible(request);
       BytesMessage reply = wallet.getSpendingKey();
-
-<<<<<<< HEAD
-      String base58check = StringUtil.encode58Check(reply.toByteArray());
-      String hexString = ByteArray.toHexString(reply.toByteArray());
-      System.out.println("b58 is: " + base58check + ", hex is: " + hexString);
-=======
->>>>>>> d73ac958875403e551f8a29f9dd7b13e8c2772b9
       response.getWriter().println(JsonFormat.printToString(reply, visible));
     } catch (Exception e) {
       Util.processError(e, response);
