@@ -6,14 +6,13 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.tron.api.GrpcAPI;
 import org.tron.api.GrpcAPI.BytesMessage;
-import org.tron.api.GrpcAPI.NfTRC20Parameters;
+import org.tron.api.GrpcAPI.ShieldedTRC20TriggerContractParameters;
 import org.tron.core.Wallet;
 
 @Component
 @Slf4j(topic = "API")
-public class IsShieldedTRC20ContractNoteSpentServlet extends RateLimiterServlet {
+public class GetTriggerInputForShieldedTRC20ContractServlet extends RateLimiterServlet {
 
   @Autowired
   private Wallet wallet;
@@ -27,9 +26,11 @@ public class IsShieldedTRC20ContractNoteSpentServlet extends RateLimiterServlet 
           .collect(Collectors.joining(System.lineSeparator()));
       Util.checkBodySize(input);
       boolean visible = Util.getVisiblePost(input);
-      NfTRC20Parameters.Builder build = NfTRC20Parameters.newBuilder();
-      JsonFormat.merge(input, build);
-      GrpcAPI.NullifierResult result = wallet.isShieldedTRC20ContractNoteSpent(build.build());
+      ShieldedTRC20TriggerContractParameters.Builder builder =
+          ShieldedTRC20TriggerContractParameters
+              .newBuilder();
+      JsonFormat.merge(input, builder);
+      BytesMessage result = wallet.getTriggerInputForShieldedTRC20Contract(builder.build());
       response.getWriter().println(JsonFormat.printToString(result, visible));
     } catch (Exception e) {
       Util.processError(e, response);

@@ -24,6 +24,7 @@ import static org.tron.common.utils.BIUtil.isLessThan;
 import static org.tron.common.utils.BIUtil.isZero;
 import static org.tron.common.utils.ByteUtil.EMPTY_BYTE_ARRAY;
 import static org.tron.common.utils.ByteUtil.bytesToBigInteger;
+import static org.tron.common.utils.ByteUtil.merge;
 import static org.tron.common.utils.ByteUtil.numberOfLeadingZeros;
 import static org.tron.common.utils.ByteUtil.parseBytes;
 import static org.tron.common.utils.ByteUtil.parseWord;
@@ -33,6 +34,7 @@ import static org.tron.core.vm.utils.MUtil.convertToTronAddress;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -47,7 +49,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.tron.common.crypto.ECKey;
 import org.tron.common.crypto.SignUtils;
 import org.tron.common.crypto.SignatureInterface;
 import org.tron.common.crypto.zksnark.BN128;
@@ -120,13 +121,13 @@ public class PrecompiledContracts {
   private static final DataWord validateMultiSignAddr = new DataWord(
       "000000000000000000000000000000000000000000000000000000000000000a");
   private static final DataWord verifyMintProofAddr = new DataWord(
-          "000000000000000000000000000000000000000000000000000000000000000b");
+      "0000000000000000000000000000000000000000000000000000000001000001");
   private static final DataWord verifyTransferProofAddr = new DataWord(
-          "000000000000000000000000000000000000000000000000000000000000000c");
+      "0000000000000000000000000000000000000000000000000000000001000002");
   private static final DataWord verifyBurnProofAddr = new DataWord(
-          "000000000000000000000000000000000000000000000000000000000000000d");
+      "0000000000000000000000000000000000000000000000000000000001000003");
   private static final DataWord merkleHashAddr = new DataWord(
-          "000000000000000000000000000000000000000000000000000000000000000e");
+      "0000000000000000000000000000000000000000000000000000000001000004");
 
   public static PrecompiledContract getContractForAddress(DataWord address) {
 
@@ -208,7 +209,8 @@ public class PrecompiledContracts {
       if (v < 27) {
         v += 27;
       }
-      SignatureInterface signature = SignUtils.fromComponents(r, s, v, DBConfig.isECKeyCryptoEngine());
+      SignatureInterface signature = SignUtils
+          .fromComponents(r, s, v, DBConfig.isECKeyCryptoEngine());
       if (signature.validateComponents()) {
         out = SignUtils.signatureToAddress(hash, signature, DBConfig.isECKeyCryptoEngine());
       }
@@ -302,6 +304,12 @@ public class PrecompiledContracts {
       return ret;
     }
 
+    protected byte[] dataBoolean(boolean result) {
+      if (result) {
+        return DataWord.ONE().getData();
+      }
+      return DataWord.ZERO().getData();
+    }
   }
 
   public static class Identity extends PrecompiledContract {
@@ -371,7 +379,7 @@ public class PrecompiledContracts {
       if (data == null) {
         data = EMPTY_BYTE_ARRAY;
       }
-      byte[] orig = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),data);
+      byte[] orig = Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(), data);
       System.arraycopy(orig, 0, target, 0, 20);
       return Pair.of(true, Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(), target));
     }
@@ -411,9 +419,11 @@ public class PrecompiledContracts {
         int sLength = data.length < 128 ? data.length - 96 : 32;
         System.arraycopy(data, 96, s, 0, sLength);
 
-        SignatureInterface signature = SignUtils.fromComponents(r, s, v[31], DBConfig.isECKeyCryptoEngine());
+        SignatureInterface signature = SignUtils
+            .fromComponents(r, s, v[31], DBConfig.isECKeyCryptoEngine());
         if (validateV(v) && signature.validateComponents()) {
-          out = new DataWord(SignUtils.signatureToAddress(h, signature, DBConfig.isECKeyCryptoEngine()));
+          out = new DataWord(
+              SignUtils.signatureToAddress(h, signature, DBConfig.isECKeyCryptoEngine()));
         }
       } catch (Throwable any) {
       }
@@ -898,30 +908,16 @@ public class PrecompiledContracts {
 
     static {
       UNCOMMITTED[0] = ByteArray.fromHexString(
-              "0100000000000000000000000000000000000000000000000000000000000000");
+          "0100000000000000000000000000000000000000000000000000000000000000");
       try {
         for (int i = 0; i < 31; i++) {
           JLibrustzcash.librustzcashMerkleHash(
-                  new LibrustzcashParam.MerkleHashParams(
-                          i, UNCOMMITTED[i], UNCOMMITTED[i], UNCOMMITTED[i + 1]));
+              new LibrustzcashParam.MerkleHashParams(
+                  i, UNCOMMITTED[i], UNCOMMITTED[i], UNCOMMITTED[i + 1]));
         }
-      } catch (ZksnarkException e) {
-        logger.info(e.getMessage());
+      } catch (Throwable any) {
+        logger.info("Initialize UNCOMMITTED array failed:{}", any.getMessage());
       }
-    }
-
-    @Override
-    public long getEnergyForData(byte[] data) {
-
-      // energy charge for the execution:
-      // minimum 50 and additional 50 for each 32 bytes word (round  up)
-      /*
-      if (data == null) {
-        return 60;
-      }
-      return 60L + (data.length + 31) / 32 * 12;
-      */
-      return 0;
     }
 
     protected long parseLong(byte[] data, int idx) {
@@ -954,7 +950,7 @@ public class PrecompiledContracts {
     }
 
     protected Pair<Boolean, byte[]> insertLeaves(
-            byte[][] frontier, long leafCount, byte[][] leafValue) {
+        byte[][] frontier, long leafCount, byte[][] leafValue) {
       long nodeIndex = 0;
       boolean success = true;
       byte[] leftInput;
@@ -968,15 +964,16 @@ public class PrecompiledContracts {
       }
       int resultArrayLength = 32;
       for (int i = 0; i < cmCount; i++) {
-        resultArrayLength += slot[i] * 32 + 1;
+        resultArrayLength += (slot[i] + 1) * 32;
       }
 
       byte[] result = new byte[resultArrayLength];
       try {
         int offset = 0;
         for (int i = 0; i < cmCount; i++) {
-          result[offset] = (byte) (slot[i] & 0xFF);
-          offset += 1;
+          byte[] slotArray = DataWord.of((byte) (slot[i] & 0xFF)).getData();
+          System.arraycopy(slotArray, 0, result, offset, 32);
+          offset += 32;
           nodeIndex = i + leafCount + TREE_WIDTH - 1;
           System.arraycopy(leafValue[i], 0, nodeValue, 0, 32);
           if (slot[i] == 0) {
@@ -993,13 +990,13 @@ public class PrecompiledContracts {
               rightInput = UNCOMMITTED[level - 1];
               nodeIndex = nodeIndex / 2;
             }
-            JLibrustzcash.librustzcashMerkleHash(
-                    new LibrustzcashParam.MerkleHashParams(level - 1, leftInput, rightInput, hash));
+            JLibrustzcash.librustzcashMerkleHash(new LibrustzcashParam.MerkleHashParams(
+                level - 1, leftInput, rightInput, hash));
             System.arraycopy(hash, 0, nodeValue, 0, 32);
             System.arraycopy(hash, 0, result, offset, 32);
             offset += 32;
           }
-          System.arraycopy(nodeValue, 0, frontier[slot[i]], 0, 32);// store in frontier
+          System.arraycopy(nodeValue, 0, frontier[slot[i]], 0, 32);
         }
 
         for (int level = slot[cmCount - 1] + 1; level <= 32; level++) {
@@ -1012,19 +1009,19 @@ public class PrecompiledContracts {
             rightInput = UNCOMMITTED[level - 1];
             nodeIndex = nodeIndex / 2;
           }
-          JLibrustzcash.librustzcashMerkleHash(
-                  new LibrustzcashParam.MerkleHashParams(level - 1, leftInput, rightInput, hash));
+          JLibrustzcash.librustzcashMerkleHash(new LibrustzcashParam.MerkleHashParams(
+              level - 1, leftInput, rightInput, hash));
           System.arraycopy(hash, 0, nodeValue, 0, 32);
         }
         System.arraycopy(nodeValue, 0, result, offset, 32);
       } catch (Throwable any) {
         success = false;
+        logger.info("Insert leaves failed:{}", any.getMessage());
       }
       if (success) {
-        logger.info("Merkle root is " + ByteArray.toHexString(nodeValue));
-        return Pair.of(true, result);
+        return Pair.of(true, merge(DataWord.ONE().getData(), result));
       } else {
-        return Pair.of(false, EMPTY_BYTE_ARRAY);
+        return Pair.of(true, DataWord.ZERO().getData());
       }
     }
   }
@@ -1034,12 +1031,17 @@ public class PrecompiledContracts {
     private static final int SIZE = 1504;
 
     @Override
+    public long getEnergyForData(byte[] data) {
+      return 150000;
+    }
+
+    @Override
     public Pair<Boolean, byte[]> execute(byte[] data) {
       if (data == null) {
-        return Pair.of(false, EMPTY_BYTE_ARRAY);
+        return Pair.of(true, DataWord.ZERO().getData());
       }
       if (data.length != SIZE) {
-        return Pair.of(false, EMPTY_BYTE_ARRAY);
+        return Pair.of(true, DataWord.ZERO().getData());
       }
       byte[] cm = new byte[32];
       byte[] cv = new byte[32];
@@ -1061,7 +1063,7 @@ public class PrecompiledContracts {
       }
       long leafCount = parseLong(data, 1472);
       if (leafCount >= TREE_WIDTH) {
-        return Pair.of(false, EMPTY_BYTE_ARRAY);
+        return Pair.of(false, DataWord.ZERO().getData());
       }
 
       boolean result;
@@ -1069,23 +1071,23 @@ public class PrecompiledContracts {
       long ctx = JLibrustzcash.librustzcashSaplingVerificationCtxInit();
       try {
         result = JLibrustzcash.librustzcashSaplingCheckOutput(
-                new LibrustzcashParam.CheckOutputParams(ctx, cv, cm, epk, proof));
+            new LibrustzcashParam.CheckOutputParams(ctx, cv, cm, epk, proof));
         long valueBalance = -value;
-
-        result &= JLibrustzcash.librustzcashSaplingFinalCheck(
-                new LibrustzcashParam.FinalCheckParams(ctx, valueBalance, bindingSig, signHash));
+        result = result && JLibrustzcash.librustzcashSaplingFinalCheck(
+            new LibrustzcashParam.FinalCheckParams(ctx, valueBalance, bindingSig, signHash));
       } catch (Throwable any) {
         result = false;
+        logger.info("Verify mint failed:{}", any.getMessage());
       } finally {
         JLibrustzcash.librustzcashSaplingVerificationCtxFree(ctx);
       }
-      logger.info("mint verify " + result);
+
       if (result) {
         byte[][] leafValue = new byte[1][32];
-        System.arraycopy(cm, 0, leafValue[0],0,32);
+        System.arraycopy(cm, 0, leafValue[0], 0, 32);
         return insertLeaves(frontier, leafCount, leafValue);
       } else {
-        return Pair.of(false, EMPTY_BYTE_ARRAY);
+        return Pair.of(true, DataWord.ZERO().getData());
       }
     }
   }
@@ -1102,12 +1104,17 @@ public class PrecompiledContracts {
     }
 
     @Override
+    public long getEnergyForData(byte[] data) {
+      return 200000;
+    }
+
+    @Override
     public Pair<Boolean, byte[]> execute(byte[] data) {
       if (data == null) {
-        return Pair.of(false, EMPTY_BYTE_ARRAY);
+        return Pair.of(true, DataWord.ZERO().getData());
       }
       if (!Arrays.asList(SIZE).contains(data.length)) {
-        return Pair.of(false, EMPTY_BYTE_ARRAY);
+        return Pair.of(true, DataWord.ZERO().getData());
       }
       byte[] bindingSig = new byte[64];
       byte[] signHash = new byte[32];
@@ -1123,7 +1130,7 @@ public class PrecompiledContracts {
       }
       long leafCount = parseLong(data, 1248);
       if (leafCount >= TREE_WIDTH - 1) {
-        return Pair.of(false, EMPTY_BYTE_ARRAY);
+        return Pair.of(true, DataWord.ZERO().getData());
       }
 
       int spendCount = parseInt(data, spendOffset);
@@ -1131,8 +1138,8 @@ public class PrecompiledContracts {
       int receiveCount = parseInt(data, receiveOffset);
 
       if (spendCount != spendAuthSigCount || spendCount < 1
-              || spendCount > 2 || receiveCount < 1 || receiveCount > 2) {
-        return Pair.of(false, EMPTY_BYTE_ARRAY);
+          || spendCount > 2 || receiveCount < 1 || receiveCount > 2) {
+        return Pair.of(true, DataWord.ZERO().getData());
       }
       byte[][] anchor = new byte[spendCount][32];
       byte[][] nullifier = new byte[spendCount][32];
@@ -1174,6 +1181,22 @@ public class PrecompiledContracts {
       for (int i = 0; i < receiveCount; i++) {
         System.arraycopy(receiveCv[i], 0, receiveCvs, 32 * i, 32);
       }
+      //check duplicate nullifiers
+      HashSet<String> nfSet = new HashSet<>();
+      for (byte[] nf : nullifier) {
+        if (nfSet.contains(ByteArray.toHexString(nf))) {
+          return Pair.of(true, DataWord.ZERO().getData());
+        }
+        nfSet.add(ByteArray.toHexString(nf));
+      }
+      //check duplicate output note
+      HashSet<String> cmSet = new HashSet<>();
+      for (byte[] cm : receiveCm) {
+        if (cmSet.contains(ByteArray.toHexString(cm))) {
+          return Pair.of(true, DataWord.ZERO().getData());
+        }
+        cmSet.add(ByteArray.toHexString(cm));
+      }
 
       int threadCount = spendCount + receiveCount + 1;
       CountDownLatch countDownLatch = new CountDownLatch(threadCount);
@@ -1188,21 +1211,21 @@ public class PrecompiledContracts {
       // submit check spend task
       for (int i = 0; i < spendCount; i++) {
         Future<Boolean> futureCheckSpend = workers
-                .submit(new SaplingCheckSpendTask(countDownLatch, ctx, spendCv[i], anchor[i],
-                        nullifier[i], rk[i], spendProof[i], spendAuthSig[i], signHash));
+            .submit(new SaplingCheckSpendTask(countDownLatch, ctx, spendCv[i], anchor[i],
+                nullifier[i], rk[i], spendProof[i], spendAuthSig[i], signHash));
         futures.add(futureCheckSpend);
       }
       //submit check output task
       for (int i = 0; i < receiveCount; i++) {
         Future<Boolean> futureCheckOutput = workers
-                .submit(new SaplingCheckOutput(countDownLatch, ctx, receiveCv[i], receiveCm[i],
-                        receiveEpk[i], receiveProof[i]));
+            .submit(new SaplingCheckOutput(countDownLatch, ctx, receiveCv[i], receiveCm[i],
+                receiveEpk[i], receiveProof[i]));
         futures.add(futureCheckOutput);
       }
       // submit check binding signature
       Future<Boolean> futureCheckBindingSig = workers
-              .submit(new SaplingCheckBingdingSig(countDownLatch, 0, bindingSig,
-                      signHash, spendCvs, spendCount * 32, receiveCvs, receiveCount * 32));
+          .submit(new SaplingCheckBingdingSig(countDownLatch, 0, bindingSig,
+              signHash, spendCvs, spendCount * 32, receiveCvs, receiveCount * 32));
       futures.add(futureCheckBindingSig);
 
       boolean checkResult = true;
@@ -1210,20 +1233,20 @@ public class PrecompiledContracts {
         countDownLatch.await(getCPUTimeLeftInNanoSecond(), TimeUnit.NANOSECONDS);
         for (Future<Boolean> future : futures) {
           boolean eachTaskResult = future.get();
-          checkResult &= eachTaskResult;
+          checkResult = checkResult && eachTaskResult;
         }
-      } catch (Exception e) {
+      } catch (Throwable any) {
         checkResult = false;
-        logger.error("parallel check proof interrupted exception! ", e);
+        logger.info("Parallel check proof interrupted exception:{}", any.getMessage());
         Thread.currentThread().interrupt();
       } finally {
         JLibrustzcash.librustzcashSaplingVerificationCtxFree(ctx);
       }
-      logger.info("transfer verify " + checkResult);
+
       if (checkResult) {
         return insertLeaves(frontier, leafCount, receiveCm);
       } else {
-        return Pair.of(false, EMPTY_BYTE_ARRAY);
+        return Pair.of(true, DataWord.ZERO().getData());
       }
     }
 
@@ -1259,8 +1282,8 @@ public class PrecompiledContracts {
         boolean result;
         try {
           result = JLibrustzcash.librustzcashSaplingCheckSpend(
-                  new LibrustzcashParam.CheckSpendParams(this.ctx, this.cv, this.anchor,
-                          this.nullifier, this.rk, this.zkproof, this.spendAuthSig, this.signHash));
+              new LibrustzcashParam.CheckSpendParams(this.ctx, this.cv, this.anchor,
+                  this.nullifier, this.rk, this.zkproof, this.spendAuthSig, this.signHash));
         } catch (ZksnarkException e) {
           throw e;
         } finally {
@@ -1295,8 +1318,8 @@ public class PrecompiledContracts {
         boolean result;
         try {
           result = JLibrustzcash.librustzcashSaplingCheckOutput(
-                  new LibrustzcashParam.CheckOutputParams(this.ctx, this.cv, this.cm,
-                          this.ephemeralKey, this.zkproof));
+              new LibrustzcashParam.CheckOutputParams(this.ctx, this.cv, this.cm,
+                  this.ephemeralKey, this.zkproof));
         } catch (ZksnarkException e) {
           throw e;
         } finally {
@@ -1318,7 +1341,7 @@ public class PrecompiledContracts {
 
       private CountDownLatch countDownLatch;
 
-      SaplingCheckBingdingSig(CountDownLatch countDownLatch, long valueBalance,  byte[] bindingSig,
+      SaplingCheckBingdingSig(CountDownLatch countDownLatch, long valueBalance, byte[] bindingSig,
                               byte[] signHash, byte[] spendCvs, int spendCvLen,
                               byte[] receiveCvs, int receiveCvLen) {
         this.valueBalance = valueBalance;
@@ -1336,9 +1359,9 @@ public class PrecompiledContracts {
         boolean result;
         try {
           result = JLibrustzcash.librustzcashSaplingFinalCheckNew(
-                  new LibrustzcashParam.FinalCheckNewParams(this.valueBalance, this.bindingSig,
-                          this.signHash, this.spendCvs, this.spendCvLen,
-                          this.receiveCvs, this.receiveCvLen));
+              new LibrustzcashParam.FinalCheckNewParams(this.valueBalance, this.bindingSig,
+                  this.signHash, this.spendCvs, this.spendCvLen,
+                  this.receiveCvs, this.receiveCvLen));
         } catch (ZksnarkException e) {
           throw e;
         } finally {
@@ -1354,12 +1377,17 @@ public class PrecompiledContracts {
     private static final int SIZE = 512;
 
     @Override
+    public long getEnergyForData(byte[] data) {
+      return 150000;
+    }
+
+    @Override
     public Pair<Boolean, byte[]> execute(byte[] data) {
       if (data == null) {
-        return Pair.of(false, EMPTY_BYTE_ARRAY);
+        return Pair.of(true, DataWord.ZERO().getData());
       }
       if (data.length != SIZE) {
-        return Pair.of(false, EMPTY_BYTE_ARRAY);
+        return Pair.of(true, DataWord.ZERO().getData());
       }
       byte[] nullifier = new byte[32];
       byte[] anchor = new byte[32];
@@ -1385,17 +1413,18 @@ public class PrecompiledContracts {
       long ctx = JLibrustzcash.librustzcashSaplingVerificationCtxInit();
       try {
         result = JLibrustzcash.librustzcashSaplingCheckSpend(
-                new LibrustzcashParam.CheckSpendParams(
-                        ctx, cv, anchor, nullifier, rk, proof, spendAuthSig, signHash));
-        result &= JLibrustzcash.librustzcashSaplingFinalCheck(
-                new LibrustzcashParam.FinalCheckParams(ctx, value, bindingSig, signHash));
+            new LibrustzcashParam.CheckSpendParams(
+                ctx, cv, anchor, nullifier, rk, proof, spendAuthSig, signHash));
+        result = result && JLibrustzcash.librustzcashSaplingFinalCheck(
+            new LibrustzcashParam.FinalCheckParams(ctx, value, bindingSig, signHash));
       } catch (Throwable any) {
         result = false;
+        logger.info("Verify burn failed:{}", any.getMessage());
       } finally {
         JLibrustzcash.librustzcashSaplingVerificationCtxFree(ctx);
       }
-      logger.info("burn verify " + result);
-      return Pair.of(result, EMPTY_BYTE_ARRAY);
+
+      return Pair.of(true, dataBoolean(result));
     }
   }
 
@@ -1404,10 +1433,7 @@ public class PrecompiledContracts {
 
     @Override
     public long getEnergyForData(byte[] data) {
-      if (data == null) {
-        return 60;
-      }
-      return 60L + (data.length + 31) / 32 * 12;
+      return 500;
     }
 
     @Override
@@ -1417,13 +1443,14 @@ public class PrecompiledContracts {
       byte[] hash = new byte[32];
       boolean res = true;
       try {
-        int level = parseInt(data, 0);
+        int level = parseInt(data);
         System.arraycopy(data, 32, left, 0, 32);
         System.arraycopy(data, 64, right, 0, 32);
         JLibrustzcash.librustzcashMerkleHash(
-                new LibrustzcashParam.MerkleHashParams(level, left, right, hash));
+            new LibrustzcashParam.MerkleHashParams(level, left, right, hash));
       } catch (Throwable any) {
         res = false;
+        logger.info("Compute MerkleHash failed:{}", any.getMessage());
       }
       if (res) {
         return Pair.of(true, hash);
@@ -1432,7 +1459,7 @@ public class PrecompiledContracts {
       }
     }
 
-    private int parseInt(byte[] data, int idx) {
+    private int parseInt(byte[] data) {
       byte[] bytes = parseBytes(data, 0, 32);
       return new DataWord(bytes).intValueSafe();
     }

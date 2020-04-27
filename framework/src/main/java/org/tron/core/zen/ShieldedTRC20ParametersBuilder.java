@@ -9,10 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
+import org.spongycastle.util.encoders.Hex;
+import org.tron.api.GrpcAPI;
+import org.tron.api.GrpcAPI.BytesMessage;
 import org.tron.api.GrpcAPI.ShieldedTRC20Parameters;
 import org.tron.common.utils.ByteArray;
 import org.tron.common.utils.ByteUtil;
-import org.tron.common.utils.DBConfig;
 import org.tron.common.utils.Sha256Hash;
 import org.tron.common.zksnark.JLibrustzcash;
 import org.tron.common.zksnark.LibrustzcashParam;
@@ -20,27 +22,23 @@ import org.tron.common.zksnark.ZksnarkUtils;
 import org.tron.core.Wallet;
 import org.tron.core.capsule.ReceiveDescriptionCapsule;
 import org.tron.core.capsule.SpendDescriptionCapsule;
-import org.tron.core.capsule.TransactionCapsule;
 import org.tron.core.exception.ZksnarkException;
-import org.tron.core.utils.TransactionUtil;
 import org.tron.core.zen.address.DiversifierT;
 import org.tron.core.zen.address.ExpandedSpendingKey;
 import org.tron.core.zen.address.PaymentAddress;
 import org.tron.core.zen.note.Note;
 import org.tron.core.zen.note.NoteEncryption;
 import org.tron.core.zen.note.OutgoingPlaintext;
-import org.tron.protos.Protocol;
 import org.tron.protos.contract.ShieldContract;
 
 @Slf4j
 public class ShieldedTRC20ParametersBuilder {
+
   private static final int MERKLE_TREE_PATH_LENGTH = 1024; // 32*32
   private static final String MERKLE_TREE_PATH_LENGTH_ERROR = "Merkle tree path format is wrong";
   @Setter
-  @Getter
   private List<SpendDescriptionInfo> spends = new ArrayList<>();
   @Setter
-  @Getter
   private List<ReceiveDescriptionInfo> receives = new ArrayList<>();
   @Getter
   private ShieldedTRC20Parameters.Builder builder = ShieldedTRC20Parameters.newBuilder();
@@ -57,6 +55,26 @@ public class ShieldedTRC20ParametersBuilder {
   @Setter
   private long transparentToAmount;
 
+  public ShieldedTRC20ParametersBuilder() {
+
+  }
+
+  public ShieldedTRC20ParametersBuilder(String type) throws ZksnarkException {
+    switch (type) {
+      case "mint":
+        shieldedTRC20ParametersType = ShieldedTRC20ParametersType.MINT;
+        break;
+      case "transfer":
+        shieldedTRC20ParametersType = ShieldedTRC20ParametersType.TRANSFER;
+        break;
+      case "burn":
+        shieldedTRC20ParametersType = ShieldedTRC20ParametersType.BURN;
+        break;
+      default:
+        throw new ZksnarkException("invalid shielded TRC-20 parameters type");
+    }
+  }
+
   private byte[] formatPath(byte[] path, long position) throws ZksnarkException {
     if (path.length != MERKLE_TREE_PATH_LENGTH) {
       throw new ZksnarkException(MERKLE_TREE_PATH_LENGTH_ERROR);
@@ -65,17 +83,17 @@ public class ShieldedTRC20ParametersBuilder {
     result[0] = 0x20;
     for (int i = 0; i < 32; i++) {
       result[1 + i * 33] = 0x20;
-      System.arraycopy(path, i * 32, result, 2 + i * 33,32);
+      System.arraycopy(path, i * 32, result, 2 + i * 33, 32);
     }
     byte[] positionBytes = ByteArray.fromLong(position);
     ZksnarkUtils.sort(positionBytes);
-    System.arraycopy(positionBytes, 0, result, 1057,8);
+    System.arraycopy(positionBytes, 0, result, 1057, 8);
     return result;
   }
 
   // Note: should call librustzcashSaplingProvingCtxFree in the caller
   private SpendDescriptionCapsule generateSpendProof(SpendDescriptionInfo spend,
-            long ctx) throws ZksnarkException {
+      long ctx) throws ZksnarkException {
     byte[] cm = spend.note.cm();
     //check if ak exists
     byte[] ak;
@@ -98,18 +116,18 @@ public class ShieldedTRC20ParametersBuilder {
     byte[] rk = new byte[32];
     byte[] zkproof = new byte[192];
     if (!JLibrustzcash.librustzcashSaplingSpendProof(
-                new LibrustzcashParam.SpendProofParams(ctx,
-                        ak,
-                        nsk,
-                        spend.note.getD().getData(),
-                        spend.note.getRcm(),
-                        spend.alpha,
-                        spend.note.getValue(),
-                        spend.anchor,
-                        path,
-                        cv,
-                        rk,
-                        zkproof))) {
+        new LibrustzcashParam.SpendProofParams(ctx,
+            ak,
+            nsk,
+            spend.note.getD().getData(),
+            spend.note.getRcm(),
+            spend.alpha,
+            spend.note.getValue(),
+            spend.anchor,
+            path,
+            cv,
+            rk,
+            zkproof))) {
       throw new ZksnarkException("Spend proof failed");
     }
     SpendDescriptionCapsule spendDescriptionCapsule = new SpendDescriptionCapsule();
@@ -123,13 +141,13 @@ public class ShieldedTRC20ParametersBuilder {
 
   // Note: should call librustzcashSaplingProvingCtxFree in the caller
   private ReceiveDescriptionCapsule generateOutputProof(ReceiveDescriptionInfo output, long ctx)
-            throws ZksnarkException {
+      throws ZksnarkException {
     byte[] cm = output.getNote().cm();
     if (ByteArray.isEmpty(cm)) {
       throw new ZksnarkException("Output is invalid");
     }
     Optional<Note.NotePlaintextEncryptionResult> res = output.getNote()
-                .encrypt(output.getNote().getPkD());
+        .encrypt(output.getNote().getPkD());
     if (!res.isPresent()) {
       throw new ZksnarkException("Failed to encrypt note");
     }
@@ -138,14 +156,14 @@ public class ShieldedTRC20ParametersBuilder {
     byte[] cv = new byte[32];
     byte[] zkProof = new byte[192];
     if (!JLibrustzcash.librustzcashSaplingOutputProof(
-                new LibrustzcashParam.OutputProofParams(ctx,
-                        encryptor.getEsk(),
-                        output.getNote().getD().getData(),
-                        output.getNote().getPkD(),
-                        output.getNote().getRcm(),
-                        output.getNote().getValue(),
-                        cv,
-                        zkProof))) {
+        new LibrustzcashParam.OutputProofParams(ctx,
+            encryptor.getEsk(),
+            output.getNote().getD().getData(),
+            output.getNote().getPkD(),
+            output.getNote().getRcm(),
+            output.getNote().getValue(),
+            cv,
+            zkProof))) {
       throw new ZksnarkException("Output proof failed");
     }
     if (ArrayUtils.isEmpty(output.ovk) || output.ovk.length != 32) {
@@ -158,11 +176,11 @@ public class ShieldedTRC20ParametersBuilder {
     receiveDescriptionCapsule.setCEnc(enc.getEncCiphertext());
     receiveDescriptionCapsule.setZkproof(zkProof);
     OutgoingPlaintext outPlaintext =
-                new OutgoingPlaintext(output.getNote().getPkD(), encryptor.getEsk());
+        new OutgoingPlaintext(output.getNote().getPkD(), encryptor.getEsk());
     receiveDescriptionCapsule.setCOut(outPlaintext
-                .encrypt(output.ovk, receiveDescriptionCapsule.getValueCommitment().toByteArray(),
-                        receiveDescriptionCapsule.getCm().toByteArray(),
-                        encryptor).getData());
+        .encrypt(output.ovk, receiveDescriptionCapsule.getValueCommitment().toByteArray(),
+            receiveDescriptionCapsule.getCm().toByteArray(),
+            encryptor).getData());
     return receiveDescriptionCapsule;
   }
 
@@ -170,57 +188,61 @@ public class ShieldedTRC20ParametersBuilder {
     for (int i = 0; i < spends.size(); i++) {
       byte[] result = new byte[64];
       JLibrustzcash.librustzcashSaplingSpendSig(
-                    new LibrustzcashParam.SpendSigParams(spends.get(i).expsk.getAsk(),
-                            spends.get(i).alpha,
-                            dataToBeSigned,
-                            result));
+          new LibrustzcashParam.SpendSigParams(spends.get(i).expsk.getAsk(),
+              spends.get(i).alpha,
+              dataToBeSigned,
+              result));
       builder.getSpendDescriptionBuilder(i)
-                    .setSpendAuthoritySignature(ByteString.copyFrom(result));
+          .setSpendAuthoritySignature(ByteString.copyFrom(result));
     }
   }
 
   private byte[] encodeSpendDescriptionWithoutSpendAuthSig(
-          ShieldContract.SpendDescription spendDescription) {
+      ShieldContract.SpendDescription spendDescription) {
     return ByteUtil.merge(spendDescription.getNullifier().toByteArray(),
-                              spendDescription.getAnchor().toByteArray(),
-                              spendDescription.getValueCommitment().toByteArray(),
-                              spendDescription.getRk().toByteArray(),
-                              spendDescription.getZkproof().toByteArray());
+        spendDescription.getAnchor().toByteArray(),
+        spendDescription.getValueCommitment().toByteArray(),
+        spendDescription.getRk().toByteArray(),
+        spendDescription.getZkproof().toByteArray());
   }
 
   private byte[] encodeReceiveDescriptionWithoutC(
-          ShieldContract.ReceiveDescription receiveDescription) {
+      ShieldContract.ReceiveDescription receiveDescription) {
     return ByteUtil.merge(receiveDescription.getNoteCommitment().toByteArray(),
-                              receiveDescription.getValueCommitment().toByteArray(),
-                              receiveDescription.getEpk().toByteArray(),
-                              receiveDescription.getZkproof().toByteArray());
+        receiveDescription.getValueCommitment().toByteArray(),
+        receiveDescription.getEpk().toByteArray(),
+        receiveDescription.getZkproof().toByteArray());
   }
 
   private byte[] encodeCencCout(ShieldContract.ReceiveDescription receiveDescription) {
     byte[] padding = new byte[12];
     return ByteUtil.merge(receiveDescription.getCEnc().toByteArray(),
-                receiveDescription.getCOut().toByteArray(),
-                padding);
+        receiveDescription.getCOut().toByteArray(),
+        padding);
   }
 
-  public ShieldedTRC20Parameters build(boolean withAsk) throws ZksnarkException {
+  public ShieldedTRC20Parameters build(boolean withAsk)
+      throws ZksnarkException {
     long ctx = JLibrustzcash.librustzcashSaplingProvingCtxInit();
     // Empty output script
     byte[] mergedBytes;
     byte[] dataHashToBeSigned; //256
+    long value = 0;
     ShieldContract.SpendDescription spendDescription;
     ShieldContract.ReceiveDescription receiveDescription;
+    ShieldedTRC20Parameters shieldedTRC20Parameters;
 
     switch (shieldedTRC20ParametersType) {
       case MINT:
-        ReceiveDescriptionInfo receive =  receives.get(0);
+        ReceiveDescriptionInfo receive = receives.get(0);
         receiveDescription = generateOutputProof(receive, ctx).getInstance();
         builder.addReceiveDescription(receiveDescription);
-        //valueBalance += transparentFromAmount;
         mergedBytes = ByteUtil.merge(shieldedTRC20Address, ByteArray
-                        .fromLong(transparentFromAmount),
-                        encodeReceiveDescriptionWithoutC(receiveDescription),
-                encodeCencCout(receiveDescription));
+                .fromLong(transparentFromAmount),
+            encodeReceiveDescriptionWithoutC(receiveDescription),
+            encodeCencCout(receiveDescription));
+        value = transparentFromAmount;
+        builder.setParameterType("mint");
         break;
       case TRANSFER:
         // Create SpendDescriptions
@@ -229,7 +251,7 @@ public class ShieldedTRC20ParametersBuilder {
           spendDescription = generateSpendProof(spend, ctx).getInstance();
           builder.addSpendDescription(spendDescription);
           mergedBytes = ByteUtil.merge(mergedBytes,
-                  encodeSpendDescriptionWithoutSpendAuthSig(spendDescription));
+              encodeSpendDescriptionWithoutSpendAuthSig(spendDescription));
         }
         // Create OutputDescriptions
         byte[] cencCout = new byte[0];
@@ -237,28 +259,29 @@ public class ShieldedTRC20ParametersBuilder {
           receiveDescription = generateOutputProof(receiveD, ctx).getInstance();
           builder.addReceiveDescription(receiveDescription);
           mergedBytes = ByteUtil.merge(mergedBytes,
-                  encodeReceiveDescriptionWithoutC(receiveDescription));
+              encodeReceiveDescriptionWithoutC(receiveDescription));
           cencCout = ByteUtil.merge(cencCout, encodeCencCout(receiveDescription));
         }
         mergedBytes = ByteUtil.merge(mergedBytes, cencCout);
+        builder.setParameterType("transfer");
         break;
       case BURN:
         SpendDescriptionInfo spend = spends.get(0);
         spendDescription = generateSpendProof(spend, ctx).getInstance();
         builder.addSpendDescription(spendDescription);
-        //valueBalance -= transparentToAmount;
         mergedBytes = ByteUtil.merge(shieldedTRC20Address,
-                encodeSpendDescriptionWithoutSpendAuthSig(spendDescription),
-                                    transparentToAddress,ByteArray.fromLong(transparentToAmount));
+            encodeSpendDescriptionWithoutSpendAuthSig(spendDescription),
+            transparentToAddress, ByteArray.fromLong(transparentToAmount));
+        value = transparentToAmount;
+        builder.setParameterType("burn");
         break;
       default:
         mergedBytes = null;
     }
-    dataHashToBeSigned = Sha256Hash.of(true,mergedBytes).getBytes();
+    dataHashToBeSigned = Sha256Hash.of(true, mergedBytes).getBytes();
     if (dataHashToBeSigned == null) {
       throw new ZksnarkException("cal transaction hash failed");
     }
-    // Create spendAuth and binding signatures
     if (withAsk) {
       createSpendAuth(dataHashToBeSigned);
     }
@@ -266,56 +289,202 @@ public class ShieldedTRC20ParametersBuilder {
     try {
       byte[] bindingSig = new byte[64];
       JLibrustzcash.librustzcashSaplingBindingSig(
-                    new LibrustzcashParam.BindingSigParams(ctx,
-                            valueBalance,
-                            dataHashToBeSigned,
-                            bindingSig)
+          new LibrustzcashParam.BindingSigParams(ctx,
+              valueBalance,
+              dataHashToBeSigned,
+              bindingSig)
       );
       builder.setBindingSignature(ByteString.copyFrom(bindingSig));
-    } catch (ZksnarkException e) {
-      throw e;
     } finally {
       JLibrustzcash.librustzcashSaplingProvingCtxFree(ctx);
+    }
+    if (withAsk || shieldedTRC20ParametersType == ShieldedTRC20ParametersType.MINT) {
+      shieldedTRC20Parameters = builder.build();
+      builder.setTriggerContractInput(
+          getTriggerContractInput(shieldedTRC20Parameters, null, value, true,
+              transparentToAddress));
     }
     return builder.build();
   }
 
+  public String getTriggerContractInput(ShieldedTRC20Parameters shieldedTRC20Parameters,
+      List<BytesMessage> spendAuthoritySignature,
+      long value, boolean withAsk, byte[] transparentToAddress) {
+    switch (shieldedTRC20ParametersType) {
+      case MINT:
+        return mintParamsToHexString(shieldedTRC20Parameters, value);
+      case TRANSFER:
+        return transferParamsToHexString(shieldedTRC20Parameters, spendAuthoritySignature, withAsk);
+      case BURN:
+        return burnParamsToHexString(shieldedTRC20Parameters, spendAuthoritySignature, value,
+            transparentToAddress, withAsk);
+      default:
+        return null;
+    }
+  }
+
+  private String mintParamsToHexString(GrpcAPI.ShieldedTRC20Parameters mintParams, long value) {
+    byte[] mergedBytes;
+    if (value < 0) {
+      throw new IllegalArgumentException("require the value be positive");
+    }
+    ShieldContract.ReceiveDescription revDesc = mintParams.getReceiveDescription(0);
+    mergedBytes = ByteUtil.merge(
+        ByteUtil.longTo32Bytes(value),
+        revDesc.getNoteCommitment().toByteArray(),
+        revDesc.getValueCommitment().toByteArray(),
+        revDesc.getEpk().toByteArray(),
+        revDesc.getZkproof().toByteArray(),
+        mintParams.getBindingSignature().toByteArray(),
+        revDesc.getCEnc().toByteArray(),
+        revDesc.getCOut().toByteArray(),
+        new byte[12]
+    );
+    return Hex.toHexString(mergedBytes);
+  }
+
+  private String transferParamsToHexString(GrpcAPI.ShieldedTRC20Parameters transferParams,
+      List<BytesMessage> spendAuthoritySignature,
+      boolean withAsk) {
+    byte[] input = new byte[0];
+    byte[] spendAuthSig = new byte[0];
+    byte[] output = new byte[0];
+    byte[] c = new byte[0];
+    byte[] bindingSig;
+    List<ShieldContract.SpendDescription> spendDescs = transferParams.getSpendDescriptionList();
+    for (ShieldContract.SpendDescription spendDesc : spendDescs) {
+      input = ByteUtil.merge(input,
+          spendDesc.getNullifier().toByteArray(),
+          spendDesc.getAnchor().toByteArray(),
+          spendDesc.getValueCommitment().toByteArray(),
+          spendDesc.getRk().toByteArray(),
+          spendDesc.getZkproof().toByteArray()
+      );
+      if (withAsk) {
+        spendAuthSig = ByteUtil.merge(
+            spendAuthSig, spendDesc.getSpendAuthoritySignature().toByteArray());
+      }
+    }
+    long spendCount = spendDescs.size();
+    if (!withAsk) {
+      if (spendCount == 1) {
+        spendAuthSig = spendAuthoritySignature.get(0).getValue().toByteArray();
+      } else {
+        spendAuthSig = ByteUtil.merge(spendAuthoritySignature.get(0).getValue().toByteArray(),
+            spendAuthoritySignature.get(1).getValue().toByteArray());
+      }
+    }
+    byte[] inputOffsetbytes = ByteUtil.longTo32Bytes(192);
+    byte[] spendCountBytes = ByteUtil.longTo32Bytes(spendCount);
+    byte[] authOffsetBytes = ByteUtil.longTo32Bytes(192 + 32 + 320 * spendCount);
+    List<ShieldContract.ReceiveDescription> recvDescs = transferParams.getReceiveDescriptionList();
+    for (ShieldContract.ReceiveDescription recvDesc : recvDescs) {
+      output = ByteUtil.merge(output,
+          recvDesc.getNoteCommitment().toByteArray(),
+          recvDesc.getValueCommitment().toByteArray(),
+          recvDesc.getEpk().toByteArray(),
+          recvDesc.getZkproof().toByteArray()
+      );
+      c = ByteUtil.merge(c,
+          recvDesc.getCEnc().toByteArray(),
+          recvDesc.getCOut().toByteArray(),
+          new byte[12]
+      );
+    }
+    long recvCount = recvDescs.size();
+    byte[] recvCountBytes = ByteUtil.longTo32Bytes(recvCount);
+    byte[] outputOffsetbytes = ByteUtil
+        .longTo32Bytes(192 + 32 + 320 * spendCount + 32 + 64 * spendCount);
+    byte[] coffsetBytes = ByteUtil
+        .longTo32Bytes(192 + 32 + 320 * spendCount + 32 + 64 * spendCount + 32
+            + 288 * recvCount);
+    bindingSig = transferParams.getBindingSignature().toByteArray();
+
+    return Hex.toHexString(ByteUtil.merge(
+        inputOffsetbytes,
+        authOffsetBytes,
+        outputOffsetbytes,
+        bindingSig,
+        coffsetBytes,
+        spendCountBytes,
+        input,
+        spendCountBytes,
+        spendAuthSig,
+        recvCountBytes,
+        output,
+        recvCountBytes,
+        c
+    ));
+  }
+
+  private String burnParamsToHexString(GrpcAPI.ShieldedTRC20Parameters burnParams,
+      List<BytesMessage> spendAuthoritySignature, long value,
+      byte[] transparentToAddress, boolean withAsk) {
+    byte[] payTo = new byte[32];
+    byte[] spendAuthSign = new byte[0];
+    if (value < 0) {
+      throw new IllegalArgumentException("require the value be positive");
+    }
+    if (ArrayUtils.isEmpty(transparentToAddress)) {
+      throw new IllegalArgumentException("the transparent payTo address is null");
+    }
+    payTo[11] = Wallet.getAddressPreFixByte();
+    System.arraycopy(transparentToAddress, 0, payTo, 12, 20);
+    ShieldContract.SpendDescription spendDesc = burnParams.getSpendDescription(0);
+    if (withAsk) {
+      spendAuthSign = spendDesc.getSpendAuthoritySignature().toByteArray();
+    } else {
+      spendAuthSign = spendAuthoritySignature.get(0).getValue().toByteArray();
+    }
+    return Hex.toHexString(ByteUtil.merge(
+        spendDesc.getNullifier().toByteArray(),
+        spendDesc.getAnchor().toByteArray(),
+        spendDesc.getValueCommitment().toByteArray(),
+        spendDesc.getRk().toByteArray(),
+        spendDesc.getZkproof().toByteArray(),
+        spendAuthSign,
+        ByteUtil.longTo32Bytes(value),
+        burnParams.getBindingSignature().toByteArray(),
+        payTo
+    ));
+  }
+
   public void addSpend(
-            ExpandedSpendingKey expsk,
-            Note note,
-            byte[] anchor,
-            byte[] path,
-            long position) throws ZksnarkException {
+      ExpandedSpendingKey expsk,
+      Note note,
+      byte[] anchor,
+      byte[] path,
+      long position) throws ZksnarkException {
     spends.add(new SpendDescriptionInfo(expsk, note, anchor, path, position));
     valueBalance += note.getValue();
   }
 
   public void addSpend(
-            ExpandedSpendingKey expsk,
-            Note note,
-            byte[] alpha,
-            byte[] anchor,
-            byte[] path,
-            long position) {
+      ExpandedSpendingKey expsk,
+      Note note,
+      byte[] alpha,
+      byte[] anchor,
+      byte[] path,
+      long position) {
     spends.add(new SpendDescriptionInfo(expsk, note, alpha, anchor, path, position));
     valueBalance += note.getValue();
   }
 
   public void addSpend(
-            byte[] ak,
-            byte[] nsk,
-            byte[] ovk,
-            Note note,
-            byte[] alpha,
-            byte[] anchor,
-            byte[] path,
-            long position) {
+      byte[] ak,
+      byte[] nsk,
+      byte[] ovk,
+      Note note,
+      byte[] alpha,
+      byte[] anchor,
+      byte[] path,
+      long position) {
     spends.add(new SpendDescriptionInfo(ak, nsk, ovk, note, alpha, anchor, path, position));
     valueBalance += note.getValue();
   }
 
   public void addOutput(byte[] ovk, PaymentAddress to, long value, byte[] memo)
-            throws ZksnarkException {
+      throws ZksnarkException {
     Note note = new Note(to, value);
     note.setMemo(memo);
     receives.add(new ReceiveDescriptionInfo(ovk, note));
@@ -330,40 +499,23 @@ public class ShieldedTRC20ParametersBuilder {
   }
 
   public static class SpendDescriptionInfo {
-    @Getter
-    @Setter
+
     private ExpandedSpendingKey expsk;
-    @Getter
-    @Setter
     private Note note;
-    @Getter
-    @Setter
     private byte[] alpha;
-    @Getter
-    @Setter
     private byte[] anchor;
-    @Getter
-    @Setter
     private byte[] path;
-    @Getter
-    @Setter
     private long position;
-    @Getter
-    @Setter
     private byte[] ak;
-    @Getter
-    @Setter
     private byte[] nsk;
-    @Getter
-    @Setter
     private byte[] ovk;
 
     private SpendDescriptionInfo(
-                ExpandedSpendingKey expsk,
-                Note note,
-                byte[] anchor,
-                byte[] path,
-                long position) throws ZksnarkException {
+        ExpandedSpendingKey expsk,
+        Note note,
+        byte[] anchor,
+        byte[] path,
+        long position) throws ZksnarkException {
       this.expsk = expsk;
       this.note = note;
       this.anchor = anchor;
@@ -374,12 +526,12 @@ public class ShieldedTRC20ParametersBuilder {
     }
 
     private SpendDescriptionInfo(
-                ExpandedSpendingKey expsk,
-                Note note,
-                byte[] alpha,
-                byte[] anchor,
-                byte[] path,
-                long position) {
+        ExpandedSpendingKey expsk,
+        Note note,
+        byte[] alpha,
+        byte[] anchor,
+        byte[] path,
+        long position) {
       this.expsk = expsk;
       this.note = note;
       this.anchor = anchor;
@@ -389,14 +541,14 @@ public class ShieldedTRC20ParametersBuilder {
     }
 
     private SpendDescriptionInfo(
-                byte[] ak,
-                byte[] nsk,
-                byte[] ovk,
-                Note note,
-                byte[] alpha,
-                byte[] anchor,
-                byte[] path,
-                long position) {
+        byte[] ak,
+        byte[] nsk,
+        byte[] ovk,
+        Note note,
+        byte[] alpha,
+        byte[] anchor,
+        byte[] path,
+        long position) {
       this.ak = ak;
       this.nsk = nsk;
       this.note = note;
@@ -410,15 +562,15 @@ public class ShieldedTRC20ParametersBuilder {
 
   @AllArgsConstructor
   private class ReceiveDescriptionInfo {
-    @Getter
+
     private byte[] ovk;
     @Getter
     private Note note;
   }
 
   public enum ShieldedTRC20ParametersType {
-        MINT,
-        TRANSFER,
-        BURN
+    MINT,
+    TRANSFER,
+    BURN
   }
 }
