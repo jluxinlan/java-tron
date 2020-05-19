@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.joda.time.DateTime;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -32,12 +33,14 @@ import org.tron.common.storage.DepositImpl;
 import org.tron.common.utils.*;
 import org.tron.common.zksnark.JLibrustzcash;
 import org.tron.common.zksnark.LibrustzcashParam;
+import org.tron.consensus.ConsensusDelegate;
 import org.tron.consensus.base.Param;
 import org.tron.core.capsule.*;
 import org.tron.core.capsule.TransactionCapsule;
 import org.tron.core.capsule.WitnessCapsule;
 import org.tron.core.config.DefaultConfig;
 import org.tron.core.config.args.Args;
+import org.tron.core.consensus.ConsensusService;
 import org.tron.core.db.Manager;
 import org.tron.core.exception.ContractValidateException;
 import org.tron.core.exception.ZksnarkException;
@@ -76,6 +79,7 @@ public class ShieldedTRC20ContractTest {
   private static Wallet wallet;
   private static Manager manager;
   private static DepositImpl deposit;
+  private static ConsensusService consensusService;
 
   private static Transaction transaction1;
   private static Transaction transaction2;
@@ -99,6 +103,8 @@ public class ShieldedTRC20ContractTest {
     ownerAddressBytes = WalletClient.decodeFromBase58Check(pubAddress);
     wallet = context.getBean(Wallet.class);
     manager = context.getBean(Manager.class);
+    consensusService = context.getBean(ConsensusService.class);
+    consensusService.start();
 
     /**
      * type 1, to create account for unit test.
@@ -130,6 +136,8 @@ public class ShieldedTRC20ContractTest {
     Args.getInstance().setFullNodeAllowShieldedTRC20TransactionArgs(true);
     Wallet.setAddressPreFixByte(Parameter.CommonConstant.ADD_PRE_FIX_BYTE_MAINNET);
 
+    manager.getDynamicPropertiesStore().saveLatestBlockHeaderNumber(0);
+
     deployContract1();
     deployContract2();
 
@@ -140,16 +148,17 @@ public class ShieldedTRC20ContractTest {
   private static void produceBlock() {
     ProduceBlock.addTransactionToStore(transaction1, manager);
     ProduceBlock.addTransactionToStore(transaction2, manager);
+    ProduceBlock.addTransactionInfoToStore(transaction1, manager);
+    ProduceBlock.addTransactionInfoToStore(transaction2, manager);
     Protocol.Block block1 = ProduceBlock.getBuildBlock(DateTime.now().minusDays(4).getMillis(), 1, 12,
             ByteArray.toHexString(ownerAddressBytes), transaction1, transaction2);
     ProduceBlock.addBlockToStore(block1, manager);
-    ProduceBlock.addTransactionInfoToStore(transaction1, manager);
-    ProduceBlock.addTransactionInfoToStore(transaction2, manager);
-    manager.getDynamicPropertiesStore().saveLatestBlockHeaderNumber(1);
+//    manager.getDynamicPropertiesStore().saveLatestBlockHeaderNumber(1);
+    pushBlock();
   }
 
   private static void deployContract1() {
-    logger.info(" ------ deployContract1 test start ------- ");
+//    logger.info(" ------ deployContract1 test start ------- ");
 
     byte[] ownerAddress = ownerAddressBytes;
     String contractName = "USDT";
@@ -194,11 +203,11 @@ public class ShieldedTRC20ContractTest {
       TransactionCapsule transactionCapsule = wallet.createTransactionCapsule(message,
               Transaction.Contract.ContractType.CreateSmartContract);
       transaction1 = transactionCapsule.getInstance();
-      logger.info(" >>>> transactionCapsule:{}", transaction1);
+//      logger.info(" >>>> transactionCapsule:{}", transaction1);
       byte[] bytes1 = WalletUtil.generateContractAddress(transaction1);
       trc20ContractAddress = WalletUtil.encode58Check(bytes1);
       trId1 = transactionCapsule.getTransactionId().getByteString();
-      logger.info(" >>>> trId:{}", transactionCapsule.getTransactionId().toString());
+//      logger.info(" >>>> trId:{}", transactionCapsule.getTransactionId().toString());
 
       SmartContractOuterClass.SmartContract smartContract = SmartContractOuterClass.SmartContract.newBuilder()
               .setOriginAddress(ByteString.copyFrom(ownerAddressBytes))
@@ -206,15 +215,15 @@ public class ShieldedTRC20ContractTest {
               .build();
 
       manager.getContractStore().put(bytes1, new ContractCapsule(smartContract));
-      logger.info(" >>>> transactionCapsule.trc20ContractAddress:{}", trc20ContractAddress);
-      logger.info(" ------ deployContract1 test end ------- ");
+//      logger.info(" >>>> transactionCapsule.trc20ContractAddress:{}", trc20ContractAddress);
+//      logger.info(" ------ deployContract1 test end ------- ");
     } catch (ContractValidateException e) {
       logger.error(e.getMessage(), e);
     }
   }
 
   private static void deployContract2() {
-    logger.info(" ------ deployContract2 test start ------- ");
+//    logger.info(" ------ deployContract2 test start ------- ");
     byte[] ownerAddress = ownerAddressBytes;
     String contractName = "PrivateUSDT";
     String abiStr = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"trc20ContractAddress\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"position\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"cm\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"cv\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"epk\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32[21]\",\"name\":\"c\",\"type\":\"bytes32[21]\"}],\"name\":\"newLeaf\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"value\",\"type\":\"uint64\"}],\"name\":\"tokenBurn\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"value\",\"type\":\"uint64\"}],\"name\":\"tokenMint\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32[10]\",\"name\":\"input\",\"type\":\"bytes32[10]\"},{\"internalType\":\"bytes32[2]\",\"name\":\"spend_auth_sig\",\"type\":\"bytes32[2]\"},{\"internalType\":\"uint64\",\"name\":\"value\",\"type\":\"uint64\"},{\"internalType\":\"bytes32[2]\",\"name\":\"bindingSignature\",\"type\":\"bytes32[2]\"},{\"internalType\":\"uint256\",\"name\":\"payToAddress\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"position\",\"type\":\"uint256\"}],\"name\":\"getPath\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32[32]\",\"name\":\"\",\"type\":\"bytes32[32]\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"latestRoot\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"leafCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"value\",\"type\":\"uint64\"},{\"internalType\":\"bytes32[9]\",\"name\":\"output\",\"type\":\"bytes32[9]\"},{\"internalType\":\"bytes32[2]\",\"name\":\"bindingSignature\",\"type\":\"bytes32[2]\"},{\"internalType\":\"bytes32[21]\",\"name\":\"c\",\"type\":\"bytes32[21]\"}],\"name\":\"mint\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"notecommitment\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"nullifiers\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"roots\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32[10][]\",\"name\":\"input\",\"type\":\"bytes32[10][]\"},{\"internalType\":\"bytes32[2][]\",\"name\":\"spend_auth_sig\",\"type\":\"bytes32[2][]\"},{\"internalType\":\"bytes32[9][]\",\"name\":\"output\",\"type\":\"bytes32[9][]\"},{\"internalType\":\"bytes32[2]\",\"name\":\"bindingSignature\",\"type\":\"bytes32[2]\"},{\"internalType\":\"bytes32[21][]\",\"name\":\"c\",\"type\":\"bytes32[21][]\"}],\"name\":\"transfer\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"tree\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]";
@@ -258,14 +267,14 @@ public class ShieldedTRC20ContractTest {
       TransactionCapsule transactionCapsule = wallet.createTransactionCapsule(message,
               Transaction.Contract.ContractType.CreateSmartContract);
       transaction2 = transactionCapsule.getInstance();
-      logger.info(" >>>> transactionCapsule:{}", transaction2);
+//      logger.info(" >>>> transactionCapsule:{}", transaction2);
       byte[] bytes1 = WalletUtil.generateContractAddress(transaction2);
       shieldedTRC20ContractAddress = WalletUtil.encode58Check(bytes1);
 
       trId2 = transactionCapsule.getTransactionId().getByteString();
-      logger.info(" >>>> trId:{}", transactionCapsule.getTransactionId().toString());
+//      logger.info(" >>>> trId:{}", transactionCapsule.getTransactionId().toString());
       Transaction transaction1 = wallet.getTransactionById(trId2);
-      logger.info(" >>>> query. transactionCapsule:{}", transaction1);
+//      logger.info(" >>>> query. transactionCapsule:{}", transaction1);
 
       SmartContractOuterClass.SmartContract smartContract = SmartContractOuterClass.SmartContract.newBuilder()
               .setOriginAddress(ByteString.copyFrom(ownerAddressBytes))
@@ -273,8 +282,8 @@ public class ShieldedTRC20ContractTest {
               .build();
 
       manager.getContractStore().put(bytes1, new ContractCapsule(smartContract));
-      logger.info(" >>>> transactionCapsule.shieldedTRC20ContractAddress:{}", shieldedTRC20ContractAddress);
-      logger.info(" ------ deployContract2 test end ------- ");
+//      logger.info(" >>>> transactionCapsule.shieldedTRC20ContractAddress:{}", shieldedTRC20ContractAddress);
+//      logger.info(" ------ deployContract2 test end ------- ");
     } catch (ContractValidateException e) {
       logger.error(e.getMessage(), e);
     }
@@ -290,9 +299,9 @@ public class ShieldedTRC20ContractTest {
       channelSolidity.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }
 
-//    Args.clearParam();
-//    context.destroy();
-//    FileUtil.deleteDir(new File(dbPath));
+    Args.clearParam();
+    context.destroy();
+    FileUtil.deleteDir(new File(dbPath));
   }
 
   @Test
@@ -313,7 +322,7 @@ public class ShieldedTRC20ContractTest {
     Protocol.Account account1 = wallet.getAccount(request);
     logger.info(" >>>>> wallet.account:{}", account1);
 
-    Transaction transaction1 = wallet.getTransactionById(trId2);
+    Transaction transaction1 = wallet.getTransactionById(trId1);
     logger.info(" >>>> query. transactionCapsule1:{}", transaction1);
     Transaction transaction2 = wallet.getTransactionById(trId2);
     logger.info(" >>>> query. transactionCapsule2:{}", transaction2);
@@ -346,7 +355,6 @@ public class ShieldedTRC20ContractTest {
     String method = "approve(address,uint256)";
     boolean isHex = true;
     byte[] inputBytes = Hex.decode(AbiUtil.parseMethod(method, input, isHex));
-    logger.info(" >>>>> input:{}", input);
 
     try {
       SmartContractOuterClass.TriggerSmartContract triggerSmartContractMsg = TvmTestUtils.buildTriggerSmartContract(
@@ -357,20 +365,14 @@ public class ShieldedTRC20ContractTest {
       GrpcAPI.TransactionExtention.Builder trxExtBuilder = GrpcAPI.TransactionExtention.newBuilder();
       GrpcAPI.Return.Builder retBuilder = GrpcAPI.Return.newBuilder();
       Transaction transaction = wallet.triggerContract(triggerSmartContractMsg, trxCap, trxExtBuilder, retBuilder);
-      logger.info(" >>>> rxId:{}", ByteArray.toHexString(transaction.getRawData().toByteArray()));
+      // 产块时间需要间隔3秒， 否则校验失败
+      TimeUnit.SECONDS.sleep(4);
       produceBlock(transaction, 2);
 
-
-      ByteString rxId = trxCap.getTransactionId().getByteString();
-      logger.info(" >>>> rxId:{}", trxCap.getTransactionId().toString());
-      logger.info(" >>>> rxId:{}", ByteArray.toHexString(Sha256Hash.hash(DBConfig.isECKeyCryptoEngine(),
-              transaction.getRawData().toByteArray())));
-
-
-      TransactionInfo transactionInfo = wallet.getTransactionInfoById(rxId);
-
-      logger.info(" >>>> transaction:{}", JsonFormat.printToString(transaction));
-      logger.info(" >>>> transaction:{}", transactionInfo == null);
+      ByteString rxId2 = ByteString.copyFrom(transaction.getRawData().toByteArray());
+      TransactionInfo transactionInfo2 = wallet.getTransactionInfoById(rxId2);
+      logger.info(" >>>> transaction2 is null:{}", transactionInfo2 == null);
+      logger.info(" >>>> transaction2 info is :{}", transactionInfo2);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }
@@ -380,12 +382,21 @@ public class ShieldedTRC20ContractTest {
 
   private static void produceBlock(Transaction transaction, int num) {
     ProduceBlock.addTransactionToStore(transaction, manager);
-    Protocol.Block block1 = ProduceBlock.getBuildBlock(DateTime.now().minusDays(4).getMillis(), 1, 12,
+    Protocol.Block block1 = ProduceBlock.getBuildBlock(DateTime.now().minusDays(4).getMillis(), num, 12,
             ByteArray.toHexString(ownerAddressBytes), transaction);
     ProduceBlock.addBlockToStore(block1, manager);
     ProduceBlock.addTransactionInfoToStore(transaction, manager);
+    pushBlock();
+  }
+
+  private static void pushBlock() {
     Param param = new Param();
-    WitnessCapsule witness = new WitnessCapsule(ByteString.copyFrom(ownerAddressBytes));
+    // 产块地址使用conf中的地址，否则校验失败
+    // 直接使用存储中的witness
+    WitnessCapsule witness = manager.getWitnessStore().getAllWitnesses().get(0);
+
+    ConsensusDelegate consensusDelegate = context.getBean(ConsensusDelegate.class);
+    consensusDelegate.saveWitness(witness);
     Param.Miner miner = param.new Miner(ByteArray.fromHexString(privateKey), witness.getAddress(), witness.getAddress());
     BlockCapsule blockCapsule = manager
             .generateBlock(miner, System.currentTimeMillis(), System.currentTimeMillis() + 1000);
@@ -394,8 +405,9 @@ public class ShieldedTRC20ContractTest {
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }
-    manager.getDynamicPropertiesStore().saveLatestBlockHeaderNumber(num);
   }
+
+
 
 
   @Ignore
