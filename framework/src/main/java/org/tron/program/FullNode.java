@@ -76,9 +76,6 @@ public class FullNode {
    */
   public static void main(String[] args) {
     logger.info("Full node running.");
-    // todo dbPath
-    String dbPath = "";
-    args = new String[]{"-d", dbPath};
     Args.setParam(args, Constant.TESTNET_CONF);
     CommonParameter parameter = Args.getInstance();
 
