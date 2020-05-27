@@ -11,7 +11,6 @@ import com.google.protobuf.ByteString;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.jetty.util.StringUtil;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -25,7 +24,6 @@ import org.tron.common.runtime.vm.DataWord;
 import org.tron.common.runtime.vm.LogInfo;
 import org.tron.common.utils.ByteArray;
 import org.tron.common.utils.Commons;
-import org.tron.common.utils.WalletUtil;
 import org.tron.core.Constant;
 import org.tron.core.actuator.VMActuator;
 import org.tron.core.capsule.BlockCapsule;
@@ -39,13 +37,7 @@ import org.tron.core.db.BlockStore;
 import org.tron.core.db.Manager;
 import org.tron.core.db.TransactionContext;
 import org.tron.core.exception.BadItemException;
-import org.tron.core.exception.ItemNotFoundException;
 import org.tron.core.services.RpcApiService;
-import org.tron.core.services.http.FullNodeHttpApiService;
-import org.tron.core.services.interfaceOnPBFT.RpcApiServiceOnPBFT;
-import org.tron.core.services.interfaceOnPBFT.http.PBFT.HttpApiOnPBFTService;
-import org.tron.core.services.interfaceOnSolidity.RpcApiServiceOnSolidity;
-import org.tron.core.services.interfaceOnSolidity.http.solidity.HttpApiOnSolidityService;
 import org.tron.core.store.StoreFactory;
 import org.tron.core.store.TransactionHistoryStore;
 import org.tron.core.store.TransactionRetStore;
@@ -75,12 +67,18 @@ public class FullNode {
 
   private static TransactionRetStore transactionRetStore;
   private static TransactionHistoryStore transactionHistoryStore;
+  private static BlockStore blockStore;
+  private static BlockIndexStore blockIndexStore;
+
 
   /**
    * Start the FullNode.
    */
   public static void main(String[] args) {
     logger.info("Full node running.");
+    // todo dbPath
+    String dbPath = "";
+    args = new String[]{"-d", dbPath};
     Args.setParam(args, Constant.TESTNET_CONF);
     CommonParameter parameter = Args.getInstance();
 
@@ -108,19 +106,14 @@ public class FullNode {
     shutdown(appT);
 
     final Manager dbManager = appT.getDbManager();
-    final BlockStore blockStore = dbManager.getBlockStore();
-    final BlockIndexStore blockIndexStore = dbManager.getBlockIndexStore();
-    final long headBlockNum = dbManager.getHeadBlockNum();
+    blockStore = dbManager.getBlockStore();
+    blockIndexStore = dbManager.getBlockIndexStore();
     transactionRetStore = dbManager.getTransactionRetStore();
     transactionHistoryStore = dbManager.getTransactionHistoryStore();
 
-    for (long num = 1; num <= headBlockNum; num++) {
-      final BlockCapsule blockCapsule = getBlockByNum(num, blockStore, blockIndexStore);
-
-
-
-    }
-
+    final long headBlockNum = dbManager.getHeadBlockNum();
+    Map<String, TreeSet<String>> tokenMap = handlerMap(headBlockNum);
+    handlerMapToDB(tokenMap, headBlockNum);
 
     // grpc api server
     RpcApiService rpcApiService = context.getBean(RpcApiService.class);
@@ -133,7 +126,31 @@ public class FullNode {
     rpcApiService.blockUntilShutdown();
   }
 
-  public static BlockCapsule getBlockByNum(long num, BlockStore blockStore, BlockIndexStore blockIndexStore) {
+  private static void handlerMapToDB(Map<String, TreeSet<String>> tokenMap, long headBlockNum) {
+    final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
+    SyncDataToDB syncDataToDB = new SyncDataToDB();
+
+    tokenMap.forEach((tokenAddress, treeSet) -> {
+      final BigInteger trc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
+      treeSet.forEach(accountAddress -> {
+        final BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
+        syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
+      });
+    });
+  }
+
+  private static Map<String, TreeSet<String>> handlerMap(long headBlockNum) {
+    Map<String, TreeSet<String>> tokenMap = new HashMap<>();
+    for (long num = 1; num <= headBlockNum; num++) {
+      final BlockCapsule blockCapsule = getBlockByNum(num);
+      final List<LogInfo> logInfoList = getLogInfoList(getTransactioninfoList(blockCapsule));
+      parseTrc20Map(blockCapsule, logInfoList, tokenMap);
+    }
+
+    return tokenMap;
+  }
+
+  private static BlockCapsule getBlockByNum(long num) {
     BlockCapsule blockCapsule = null;
     try {
       blockCapsule = blockStore.get(blockIndexStore.get(num).getBytes());
@@ -143,8 +160,7 @@ public class FullNode {
     return blockCapsule;
   }
 
-
-  private static List<Protocol.TransactionInfo> parseTransactionInfoFromBlockDB(BlockCapsule blockCapsule) {
+  private static List<Protocol.TransactionInfo> getTransactioninfoList(BlockCapsule blockCapsule) {
     List<Protocol.TransactionInfo> ret = new ArrayList<>();
     Map<ByteString, Protocol.TransactionInfo> retMap = new HashMap<>();
     TransactionRetCapsule retCapsule = null;
@@ -181,7 +197,6 @@ public class FullNode {
     return ret;
   }
 
-
   private static List<LogInfo> getLogInfoList(List<Protocol.TransactionInfo> transactionInfos) {
     List<LogInfo> ret = new ArrayList<>();
     for (Protocol.TransactionInfo transactionInfo : transactionInfos) {
@@ -199,15 +214,7 @@ public class FullNode {
     return ret;
   }
 
-
-  public static List<AssetStatusPojo> parseTrc20AssetStatusPojo(BlockCapsule block, List<LogInfo> logInfos) {
-    List<AssetStatusPojo> ret = new ArrayList<>();
-
-    Set<String> tokenSet = new HashSet<>();
-
-    Map<String, BigInteger> incrementMap = new LinkedHashMap<>();
-    Map<String, BigInteger> balanceMap = new LinkedHashMap<>();
-    Map<String, BigInteger> decimalMap = new LinkedHashMap<>();
+  public static void parseTrc20Map(BlockCapsule block, List<LogInfo> logInfos, Map<String, TreeSet<String>> tokenMap) {
     for (LogInfo logInfo : logInfos) {
       List<String> topics = logInfo.getHexTopics();
       if (topics == null) {
@@ -221,62 +228,18 @@ public class FullNode {
                 .encode58Check(MUtil.convertToTronAddress(logInfo.getTopics().get(2).getLast20Bytes()));
         String tokenAddress = MUtil
                 .encode58Check(MUtil.convertToTronAddress(logInfo.getAddress()));
-        BigInteger increment = hexStrToBigInteger(logInfo.getHexData());
-        if (increment != null) {
-          adjustIncrement(incrementMap, recAddr, tokenAddress, increment);
-          adjustIncrement(incrementMap, senderAddr, tokenAddress, increment.negate());
+
+        TreeSet<String> treeSet = tokenMap.get(tokenAddress);
+        if (treeSet == null) {
+          treeSet = new TreeSet<String>();
+          tokenMap.put(tokenAddress, treeSet);
         }
 
-        tokenSet.add(tokenAddress);
-
+        treeSet.add(senderAddr);
+        treeSet.add(recAddr);
       }
     }
-    for (String keys : incrementMap.keySet()) {
-      // foreach address try to get it's balance.
-      String[] key = keys.split(",");
-      BigInteger balance = getTRC20Balance(key[0], key[1], block);
-      if (balance != null) {
-        balanceMap.put(keys, balance);
-      }
-    }
-    for (String token : tokenSet) {
-      BigInteger decimals = getTRC20Decimal(token, block);
-      if (decimals != null) {
-        decimalMap.put(token, decimals);
-      }
-    }
-
-    logger.info("incrementMap: {}", incrementMap);
-    logger.info("balanceMap: {}", balanceMap);
-    logger.info("decimalsMap: {}", decimalMap);
-
-    //
-    for (String keys : incrementMap.keySet()) {
-      String[] key = keys.split(",");
-      AssetStatusPojo assetStatusPojo = new AssetStatusPojo();
-      assetStatusPojo.setAccountAddress(key[0]);
-      assetStatusPojo.setTokenAddress(key[1]);
-      assetStatusPojo.setIncrementBalance(bigIntegertoString(incrementMap.get(keys)));
-      assetStatusPojo.setBalance(bigIntegertoString(balanceMap.get(keys)));
-      assetStatusPojo.setDecimals(bigIntegertoString(decimalMap.get(key[1])));
-      ret.add(assetStatusPojo);
-    }
-
-    return ret;
   }
-
-
-  private static void adjustIncrement(Map<String, BigInteger> incrementMap, String address,
-                                      String token,
-                                      BigInteger wad) {
-    BigInteger previous = incrementMap.get(address + "," + token);
-    if (previous == null) {
-      previous = new BigInteger("0");
-    }
-    previous = previous.add(wad);
-    incrementMap.put(address + "," + token, previous);
-  }
-
 
   public static BigInteger getTRC20Balance(String ownerAddress, String contractAddress,
                                            BlockCapsule baseBlockCap) {
@@ -314,8 +277,7 @@ public class FullNode {
   private static ProgramResult triggerFromVM(String contractAddress, byte[] data,
                                              BlockCapsule baseBlockCap) {
     SmartContractOuterClass.TriggerSmartContract.Builder build = SmartContractOuterClass.TriggerSmartContract.newBuilder();
-    build.setData(
-            ByteString.copyFrom(data));
+    build.setData(ByteString.copyFrom(data));
     build.setOwnerAddress(ByteString.EMPTY);
     build.setCallValue(0);
     build.setCallTokenValue(0);
@@ -345,7 +307,7 @@ public class FullNode {
     return result;
   }
 
-  public static BigInteger toBigInteger(byte[] input) {
+  private static BigInteger toBigInteger(byte[] input) {
     if (input != null && input.length > 0) {
       try {
         String hex = Hex.toHexString(input);
@@ -364,7 +326,7 @@ public class FullNode {
   }
 
   public static BigInteger hexStrToBigInteger(String hexStr) {
-    if (StringUtil.isNotBlank(hexStr)) {
+    if (!StringUtils.isEmpty(hexStr)) {
       try {
         return new BigInteger(hexStr, 16);
       } catch (Exception e) {

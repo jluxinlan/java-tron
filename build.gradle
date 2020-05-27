@@ -46,6 +46,7 @@ subprojects {
         compile "org.apache.commons:commons-lang3:3.4"
         compile group: 'org.apache.commons', name: 'commons-math', version: '2.2'
         compile "org.apache.commons:commons-collections4:4.0"
+        compile 'mysql:mysql-connector-java'
         compile group: 'joda-time', name: 'joda-time', version: '2.3'
 
     }
