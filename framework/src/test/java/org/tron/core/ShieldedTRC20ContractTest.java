@@ -1,5 +1,6 @@
 package org.tron.core;
 
+import static org.tron.core.vm.utils.MUtil.convertToTronAddress;
 import static org.tron.core.zksnark.LibrustzcashTest.librustzcashInitZksnarkParams;
 
 import com.google.protobuf.ByteString;
@@ -12,7 +13,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.joda.time.DateTime;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -41,10 +41,12 @@ import org.tron.core.capsule.WitnessCapsule;
 import org.tron.core.config.DefaultConfig;
 import org.tron.core.config.args.Args;
 import org.tron.core.consensus.ConsensusService;
+import org.tron.core.db.BlockStore;
 import org.tron.core.db.Manager;
-import org.tron.core.exception.ContractValidateException;
-import org.tron.core.exception.ZksnarkException;
-import org.tron.core.services.http.JsonFormat;
+import org.tron.core.db.TransactionHistoryStore;
+import org.tron.core.exception.*;
+import org.tron.core.store.AccountStore;
+import org.tron.core.store.ContractStore;
 import org.tron.core.util.BuildContract;
 import org.tron.core.util.ProduceBlock;
 import org.tron.core.zen.address.DiversifierT;
@@ -63,6 +65,7 @@ import org.tron.protos.contract.SmartContractOuterClass;
 import stest.tron.wallet.common.client.Parameter;
 import stest.tron.wallet.common.client.WalletClient;
 import stest.tron.wallet.common.client.utils.AbiUtil;
+import stest.tron.wallet.common.client.utils.DataWord;
 import stest.tron.wallet.common.client.utils.PublicMethed;
 
 @Slf4j
@@ -304,8 +307,86 @@ public class ShieldedTRC20ContractTest {
     FileUtil.deleteDir(new File(dbPath));
   }
 
+
+  @Test
+  public void forTest() {
+    logger.info(" ------ forTest start ------- ");
+    BlockStore blockStore = context.getBean(BlockStore.class);
+    TransactionHistoryStore trxHis = context.getBean(TransactionHistoryStore.class);
+
+    List<BlockCapsule> blocks = blockStore.getLimitNumber(0, 10);
+    logger.info(" >>> blockByLatestNum:{}", blocks.size());
+
+    blocks.stream().forEach(block -> {
+      final List<TransactionCapsule> transactions = block.getTransactions();
+      transactions.stream().forEach(transaction -> {
+        final Sha256Hash transactionId = transaction.getTransactionId();
+        try {
+          final TransactionInfoCapsule transactionInfoCapsule = trxHis.get(transactionId.getBytes());
+
+          if (transactionInfoCapsule == null || transactionInfoCapsule.getInstance() == null
+                  || transactionInfoCapsule.getInstance().getLogCount() < 0) {
+            logger.info(" >>>>>>>> transactionInfoCapsule:{}", transactionInfoCapsule);
+            return;
+          }
+
+          final TransactionInfo.Log log = transactionInfoCapsule.getInstance().getLogList().get(0);
+          final String myAddress = WalletUtil.encode58Check(convertToTronAddress(new DataWord(log.getAddress().toByteArray()).getLast20Bytes()));
+          logger.info(" >>>> address :{}", log.getAddress().toString()); // 20币地址
+          logger.info(" >>>> address :{}", myAddress); // 20币地址
+          log.getTopicsList().get(0); // 方法名 transferTo(from, to)
+          log.getTopics(1);// from的地址
+          //ByteArray
+
+//          final String myAddress = WalletUtil.encode58Check(convertToTronAddress(new DataWord(log.getTopics(1).toByteArray()).getLast20Bytes()));
+
+          log.getTopics(2); // to地址
+          log.getData(); // val金额
+
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      });
+    });
+
+    AccountStore accountStore = context.getBean(AccountStore.class);
+    ContractStore contractStore = context.getBean(ContractStore.class);
+    logger.info(" >>>> account.size:{}", accountStore.size());
+    logger.info(" >>>> contractStore.size:{}", contractStore.size());
+    accountStore.forEach(item -> {
+      final Protocol.AccountType type = item.getValue().getType();
+
+      // 不是普通账户则返回
+      if (type.getNumber() != 0) {
+        return;
+      }
+
+      String accountAddress = WalletClient.encode58Check(item.getKey());
+      logger.info(" >>>> accountAddress:{}", accountAddress);
+
+      contractStore.forEach(token -> {
+        String tokenAddress = WalletClient.encode58Check(token.getKey());
+        logger.info(" >>>> tokenAddress:{}", tokenAddress);
+        balanceOfTest(tokenAddress, accountAddress);
+      });
+    });
+
+
+    contractStore.forEach(item -> {
+      final SmartContractOuterClass.SmartContract contract = item.getValue().getInstance();
+//      logger.info(" >>>> contractStore, key:{}", WalletClient.encode58Check(item.getKey()));
+//      logger.info(" >>>> contractStore, address:{}, ", WalletClient.encode58Check(contract.getContractAddress().toByteArray()));
+      contract.getAllFields().forEach((k, v) -> {
+//        logger.info(" >>>> getAllFields, val:{}", WalletClient.encode58Check(((ByteString) v).toByteArray()));
+      });
+    });
+
+    logger.info(" ------ forTest end ------- ");
+  }
+
   @Test
   public void getBalance() {
+
     logger.info(" ------ getBalance test start ------- ");
     WalletClient walletClient = new WalletClient(privateKey);
     byte[] address = walletClient.getAddress();
@@ -340,6 +421,46 @@ public class ShieldedTRC20ContractTest {
     }
 
     logger.info(" ------ getBalance test end ------- ");
+  }
+
+  public void balanceOfTest(String tokenAddress, String accountAddress) {
+    byte[] contractAddress = WalletClient.decodeFromBase58Check(tokenAddress);
+    byte[] userAccountAddress = new byte[32];
+    byte[] shieldedContractAddress = WalletClient.decodeFromBase58Check(accountAddress);
+    System.arraycopy(shieldedContractAddress, 0, userAccountAddress, 11, 21);
+    String methodSign = "balanceOf(address)";
+    byte[] selector = new byte[4];
+    System.arraycopy(Hash.sha3(methodSign.getBytes()), 0, selector, 0, 4);
+    byte[] input = ByteUtil.merge(selector, userAccountAddress);
+
+    SmartContractOuterClass.TriggerSmartContract.Builder triggerBuilder = SmartContractOuterClass.TriggerSmartContract.newBuilder();
+    triggerBuilder.setContractAddress(ByteString.copyFrom(contractAddress));
+    triggerBuilder.setData(ByteString.copyFrom(input));
+
+    try {
+      TransactionCapsule trxCap = wallet.createTransactionCapsule(triggerBuilder.build(),
+              Transaction.Contract.ContractType.TriggerSmartContract);
+      GrpcAPI.TransactionExtention.Builder trxExtBuilder = GrpcAPI.TransactionExtention.newBuilder();
+      GrpcAPI.Return.Builder retBuilder = GrpcAPI.Return.newBuilder();
+
+      final Transaction transaction = wallet.triggerConstantContract(triggerBuilder.build(), trxCap, trxExtBuilder, retBuilder);
+      trxExtBuilder.setTransaction(transaction);
+      trxExtBuilder.setTxid(trxCap.getTransactionId().getByteString());
+      String result = mergeResult(trxExtBuilder.build());
+      logger.info(" >>>>> balance:{}", result);
+    } catch (Exception e) {
+      logger.error(" >>> trigger contract error:", e);
+    }
+  }
+
+  private String mergeResult(GrpcAPI.TransactionExtention trxExt2) {
+    List<ByteString> list = trxExt2.getConstantResultList();
+    byte[] listBytes = new byte[0];
+    for (ByteString bs : list) {
+      listBytes = ByteUtil.merge(listBytes, bs.toByteArray());
+    }
+
+    return Hex.toHexString(listBytes);
   }
 
   @Test
