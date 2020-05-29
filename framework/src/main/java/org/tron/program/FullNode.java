@@ -5,15 +5,19 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import com.google.common.primitives.Bytes;
 import com.google.protobuf.ByteString;
+import com.sun.prism.shader.Solid_TextureYV12_Loader;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.tron.common.application.Application;
 import org.tron.common.application.ApplicationFactory;
@@ -75,11 +79,16 @@ public class FullNode {
    * Start the FullNode.
    */
   public static void main(String[] args) {
-    logger.info("Full node running.");
-    Args.setParam(args, Constant.TESTNET_CONF);
+    System.out.println(" >>>>>>>>>>> start");
+    String dbPath = "/Users/tron/Downloads/output-directory";
+    args = new String[] {"-d", dbPath};
+//    String conf = Constant.TESTNET_CONF;
+    String conf = "/Users/tron/Downloads/main_net_config.conf";
+    Args.setParam(args, conf);
     CommonParameter parameter = Args.getInstance();
 
     load(parameter.getLogbackPath());
+    System.out.println(" >>>>>>>>>>> load");
 
     if (parameter.isHelp()) {
       logger.info("Here is the help message.");
@@ -94,13 +103,17 @@ public class FullNode {
 
     DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
     beanFactory.setAllowCircularReferences(false);
-    TronApplicationContext context =
-        new TronApplicationContext(beanFactory);
+    TronApplicationContext context = new TronApplicationContext(beanFactory);
     context.register(DefaultConfig.class);
+    System.out.println(" >>>>>>>>>>> context");
 
+    long l1 = System.currentTimeMillis();
     context.refresh();
+    long l2 = System.currentTimeMillis();
+    System.out.println(" >>>>>>>>>>> context refresh, cost:" + (l2 - l1));
     Application appT = ApplicationFactory.create(context);
     shutdown(appT);
+    System.out.println(" >>>>>>>>>>> shutdown");
 
     final Manager dbManager = appT.getDbManager();
     blockStore = dbManager.getBlockStore();
@@ -108,19 +121,22 @@ public class FullNode {
     transactionRetStore = dbManager.getTransactionRetStore();
     transactionHistoryStore = dbManager.getTransactionHistoryStore();
 
+
+
     final long headBlockNum = dbManager.getHeadBlockNum();
-    Map<String, TreeSet<String>> tokenMap = handlerMap(headBlockNum);
-    handlerMapToDB(tokenMap, headBlockNum);
+    System.out.println(" >>>>>>>>>>> headBlockNum" + headBlockNum);
 
-    // grpc api server
-    RpcApiService rpcApiService = context.getBean(RpcApiService.class);
-    appT.addService(rpcApiService);
+    Map<String, Set<String>> tokenMap = new ConcurrentHashMap<>();
+//    handlerMap(headBlockNum, tokenMap);
+    System.out.println(" >>> tokenMap.size:{}" + tokenMap.size());
+    final long count = tokenMap.entrySet().stream().mapToInt(item -> item.getValue().size()).count();
+    System.out.println(" >>> tokenMap.val.size:{}" + count);
 
-    appT.initServices(parameter);
-    appT.startServices();
-    appT.startup();
+//    handlerMapToDB(tokenMap, headBlockNum);
 
-    rpcApiService.blockUntilShutdown();
+
+    System.out.println(" >>>>>>>>>>> main is end!!!!!!!!");
+    System.exit(0);
   }
 
   private static void handlerMapToDB(Map<String, TreeSet<String>> tokenMap, long headBlockNum) {
@@ -136,15 +152,17 @@ public class FullNode {
     });
   }
 
-  private static Map<String, TreeSet<String>> handlerMap(long headBlockNum) {
-    Map<String, TreeSet<String>> tokenMap = new HashMap<>();
+  private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
+    long l1 = System.currentTimeMillis();
     for (long num = 1; num <= headBlockNum; num++) {
-      final BlockCapsule blockCapsule = getBlockByNum(num);
-      final List<LogInfo> logInfoList = getLogInfoList(getTransactioninfoList(blockCapsule));
-      parseTrc20Map(blockCapsule, logInfoList, tokenMap);
-    }
+      parseTrc20Map(num, tokenMap);
 
-    return tokenMap;
+      if (num % 10000 == 0) {
+        long l2 = System.currentTimeMillis();
+        System.out.println(" >>>>>>>>>>> handlerMap, num:" + num + ", time:" + (l2 - l1));
+        l1 = l2;
+      }
+    }
   }
 
   private static BlockCapsule getBlockByNum(long num) {
@@ -211,31 +229,52 @@ public class FullNode {
     return ret;
   }
 
-  public static void parseTrc20Map(BlockCapsule block, List<LogInfo> logInfos, Map<String, TreeSet<String>> tokenMap) {
-    for (LogInfo logInfo : logInfos) {
-      List<String> topics = logInfo.getHexTopics();
-      if (topics == null) {
-        continue;
-      }
-      if (topics.size() >= 3 && topics.get(0).equals(ConcernTopics.TRANSFER.getSignHash())) {
-        //TransferCase : decrease sender, increase receiver
-        String senderAddr = MUtil
-                .encode58Check(MUtil.convertToTronAddress(logInfo.getTopics().get(1).getLast20Bytes()));
-        String recAddr = MUtil
-                .encode58Check(MUtil.convertToTronAddress(logInfo.getTopics().get(2).getLast20Bytes()));
-        String tokenAddress = MUtil
-                .encode58Check(MUtil.convertToTronAddress(logInfo.getAddress()));
-
-        TreeSet<String> treeSet = tokenMap.get(tokenAddress);
-        if (treeSet == null) {
-          treeSet = new TreeSet<String>();
-          tokenMap.put(tokenAddress, treeSet);
+  public static void parseTrc20Map(Long blockNum, Map<String, Set<String>> tokenMap) {
+    try {
+      TransactionRetCapsule retCapsule = transactionRetStore
+              .getTransactionInfoByBlockNum(ByteArray.fromLong(blockNum));
+      if (retCapsule != null) {
+        for (Protocol.TransactionInfo transactionResultInfo : retCapsule.getInstance().getTransactioninfoList()) {
+          List<Protocol.TransactionInfo.Log> logs = transactionResultInfo.getLogList();
+          for (Protocol.TransactionInfo.Log l : logs) {
+            handlerToMap(l, tokenMap);
+          }
         }
-
-        treeSet.add(senderAddr);
-        treeSet.add(recAddr);
       }
+    } catch (BadItemException e) {
+      logger.error("TRC20Parser: block: {} parse error ", blockNum);
     }
+  }
+
+  private static void handlerToMap(Protocol.TransactionInfo.Log log, Map<String, Set<String>> tokenMap) {
+    final List<ByteString> topicsList = log.getTopicsList();
+
+    if (CollectionUtils.isEmpty(topicsList) || topicsList.size() < 3) {
+      return;
+    }
+
+    final String topic0 = new DataWord(topicsList.get(0).toByteArray()).toHexString();
+
+    if (!Objects.equals(topic0, ConcernTopics.TRANSFER.getSignHash())) {
+      return;
+    }
+
+    //TransferCase : decrease sender, increase receiver
+    String senderAddr = MUtil
+            .encode58Check(MUtil.convertToTronAddress(new DataWord(topicsList.get(1).toByteArray()).getLast20Bytes()));
+    String recAddr = MUtil
+            .encode58Check(MUtil.convertToTronAddress(new DataWord(topicsList.get(2).toByteArray()).getLast20Bytes()));
+    String tokenAddress = MUtil
+            .encode58Check(MUtil.convertToTronAddress(log.getAddress().toByteArray()));
+
+    Set<String> treeSet = tokenMap.get(tokenAddress);
+    if (treeSet == null) {
+      treeSet = ConcurrentHashMap.newKeySet();
+      tokenMap.put(tokenAddress, treeSet);
+    }
+
+    treeSet.add(senderAddr);
+    treeSet.add(recAddr);
   }
 
   public static BigInteger getTRC20Balance(String ownerAddress, String contractAddress,
