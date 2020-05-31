@@ -316,8 +316,9 @@ public class FullNode {
     byte[] data = Bytes.concat(Hex.decode("70a082310000000000000000000000"),
             Commons.decodeFromBase58Check(ownerAddress));
     ProgramResult result = triggerFromVM(contractAddress, data, baseBlockCap);
-    if (result != null && result.getResultCode().equals(Protocol.Transaction.Result.contractResult.SUCCESS) &&
-            !result.isRevert() && StringUtils.isEmpty(result.getRuntimeError())
+    if (result != null && result.getResultCode() != null
+            && Objects.equals(result.getResultCode(), Protocol.Transaction.Result.contractResult.SUCCESS)
+            &&!result.isRevert() && StringUtils.isEmpty(result.getRuntimeError())
             && result.getHReturn() != null) {
       try {
         BigInteger ret = toBigInteger(result.getHReturn());
