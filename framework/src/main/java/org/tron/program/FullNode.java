@@ -176,7 +176,7 @@ public class FullNode {
     long l1 = System.currentTimeMillis();
 
 
-    LongStream.range(headBlockNum - 500000, headBlockNum - 10000).forEach(item -> {
+    LongStream.range(headBlockNum - 100000, headBlockNum - 10000).forEach(item -> {
       parseTrc20Map(item, tokenMap);
 
       if (item % 10000 == 0) {
@@ -311,7 +311,7 @@ public class FullNode {
     byte[] data = Bytes.concat(Hex.decode("70a082310000000000000000000000"),
             Commons.decodeFromBase58Check(ownerAddress));
     ProgramResult result = triggerFromVM(contractAddress, data, baseBlockCap);
-    if (result.getResultCode().equals(Protocol.Transaction.Result.contractResult.SUCCESS) &&
+    if (result != null && result.getResultCode().equals(Protocol.Transaction.Result.contractResult.SUCCESS) &&
             !result.isRevert() && StringUtils.isEmpty(result.getRuntimeError())
             && result.getHReturn() != null) {
       try {
@@ -326,7 +326,7 @@ public class FullNode {
   public static BigInteger getTRC20Decimal(String contractAddress, BlockCapsule baseBlockCap) {
     byte[] data = Hex.decode("313ce567");
     ProgramResult result = triggerFromVM(contractAddress, data, baseBlockCap);
-    if (result.getResultCode().equals(Protocol.Transaction.Result.contractResult.SUCCESS) && !result.isRevert() && StringUtils
+    if (result != null && result.getResultCode().equals(Protocol.Transaction.Result.contractResult.SUCCESS) && !result.isRevert() && StringUtils
             .isEmpty(result.getRuntimeError())
             && result.getHReturn() != null) {
       try {
