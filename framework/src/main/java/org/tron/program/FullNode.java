@@ -129,7 +129,7 @@ public class FullNode {
     System.out.println(" >>>>>>>>>>> headBlockNum" + headBlockNum);
 
     Map<String, Set<String>> tokenMap = new ConcurrentHashMap<>();
-//    handlerMap(headBlockNum, tokenMap);
+    handlerMap(headBlockNum, tokenMap);
     System.out.println(" >>> tokenMap.size:{}" + tokenMap.size());
     final long count = tokenMap.entrySet().stream().mapToInt(item -> item.getValue().size()).count();
     System.out.println(" >>> tokenMap.val.size:{}" + count);
