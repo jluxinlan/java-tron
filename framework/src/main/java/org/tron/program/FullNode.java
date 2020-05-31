@@ -6,6 +6,7 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -135,28 +136,40 @@ public class FullNode {
     System.out.println(" >>> tokenMap.size:{}" + tokenMap.keySet().size());
 
 //    final long count = tokenMap.entrySet().stream().mapToInt(item -> item.getValue().size()).count();
-    tokenMap.forEach((k, v) -> {
-      System.out.println(" >>>>>>>> tokenMap,k:" + k + ", set.size:" + v.size());
-    });
+//    tokenMap.forEach((k, v) -> {
+//      System.out.println(" >>>>>>>> tokenMap,k:" + k + ", set.size:" + v.size());
+//    });
+    final long sum = tokenMap.values().stream().mapToLong(item -> item.size()).sum();
+    System.out.println(" >>> tokenMap.size:{}" + sum);
 //    System.out.println(" >>> tokenMap.val.size:{}" + count);
 
-//    handlerMapToDB(tokenMap, headBlockNum);
+    handlerMapToDB(tokenMap, headBlockNum);
 
 
     System.out.println(" >>>>>>>>>>> main is end!!!!!!!!");
     System.exit(0);
   }
 
-  private static void handlerMapToDB(Map<String, TreeSet<String>> tokenMap, long headBlockNum) {
+  private static void handlerMapToDB(Map<String, Set<String>> tokenMap, long headBlockNum) {
     final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
     SyncDataToDB syncDataToDB = new SyncDataToDB();
+    final AtomicInteger count = new AtomicInteger();
 
     tokenMap.forEach((tokenAddress, treeSet) -> {
       final BigInteger trc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
       treeSet.forEach(accountAddress -> {
         final BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
-        syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
+        if (count.get() % 100 == 0) {
+          System.out.println(" >>> token:" + tokenAddress + ", acc:" + accountAddress + ",banlace:" + trc20Balance + ", dec:" + trc20Decimal);
+        }
+
+        count.incrementAndGet();
+//        syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
       });
+
+      if (count.get() > 10000) {
+        return;
+      }
     });
   }
 
