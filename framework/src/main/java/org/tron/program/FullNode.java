@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import com.google.common.primitives.Bytes;
@@ -159,9 +160,7 @@ public class FullNode {
       final BigInteger trc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
       treeSet.forEach(accountAddress -> {
         final BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
-        if (count.get() % 100 == 0) {
-          System.out.println(" >>> token:" + tokenAddress + ", acc:" + accountAddress + ",banlace:" + trc20Balance + ", dec:" + trc20Decimal);
-        }
+        System.out.println(" >>> token:" + tokenAddress + ", acc:" + accountAddress + ",banlace:" + trc20Balance + ", dec:" + trc20Decimal);
 
         count.incrementAndGet();
 //        syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
@@ -177,7 +176,7 @@ public class FullNode {
     long l1 = System.currentTimeMillis();
 
 
-    IntStream.range(15000000, 17000000).asLongStream().forEach(item -> {
+    LongStream.range(headBlockNum - 500000, headBlockNum).forEach(item -> {
       parseTrc20Map(item, tokenMap);
 
       if (item % 10000 == 0) {
