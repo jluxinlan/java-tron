@@ -136,7 +136,7 @@ public class FullNode {
 
 //    final long count = tokenMap.entrySet().stream().mapToInt(item -> item.getValue().size()).count();
     tokenMap.forEach((k, v) -> {
-      System.out.println(" >>>>>>>> tokenMap,k:" + k + ", set:" + v);
+      System.out.println(" >>>>>>>> tokenMap,k:" + k + ", set.size:" + v.size());
     });
 //    System.out.println(" >>> tokenMap.val.size:{}" + count);
 
