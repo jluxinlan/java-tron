@@ -7,6 +7,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import com.google.common.primitives.Bytes;
 import com.google.protobuf.ByteString;
@@ -130,9 +132,13 @@ public class FullNode {
 
     Map<String, Set<String>> tokenMap = new ConcurrentHashMap<>();
     handlerMap(headBlockNum, tokenMap);
-    System.out.println(" >>> tokenMap.size:{}" + tokenMap.size());
-    final long count = tokenMap.entrySet().stream().mapToInt(item -> item.getValue().size()).count();
-    System.out.println(" >>> tokenMap.val.size:{}" + count);
+    System.out.println(" >>> tokenMap.size:{}" + tokenMap.keySet().size());
+
+//    final long count = tokenMap.entrySet().stream().mapToInt(item -> item.getValue().size()).count();
+    tokenMap.forEach((k, v) -> {
+      System.out.println(" >>>>>>>> tokenMap,k:" + k + ", set:" + v);
+    });
+//    System.out.println(" >>> tokenMap.val.size:{}" + count);
 
 //    handlerMapToDB(tokenMap, headBlockNum);
 
@@ -156,15 +162,24 @@ public class FullNode {
 
   private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
     long l1 = System.currentTimeMillis();
-    for (long num = 1; num <= headBlockNum; num++) {
-      parseTrc20Map(num, tokenMap);
 
-      if (num % 10000 == 0) {
-        long l2 = System.currentTimeMillis();
-        System.out.println(" >>>>>>>>>>> handlerMap, num:" + num + ", time:" + (l2 - l1));
-        l1 = l2;
+
+    IntStream.range(15000000, 17000000).asLongStream().forEach(item -> {
+      parseTrc20Map(item, tokenMap);
+
+      if (item % 10000 == 0) {
+        System.out.println(" >>>>>>>>>>> handlerMap, num:" + item + ", time:" + System.currentTimeMillis());
       }
-    }
+    });
+//    for (long num = 1; num <= headBlockNum; num++) {
+//      parseTrc20Map(num, tokenMap);
+//
+//      if (num % 10000 == 0) {
+//        long l2 = System.currentTimeMillis();
+//        System.out.println(" >>>>>>>>>>> handlerMap, num:" + num + ", time:" + (l2 - l1));
+//        l1 = l2;
+//      }
+//    }
   }
 
   private static BlockCapsule getBlockByNum(long num) {
