@@ -157,17 +157,22 @@ public class FullNode {
     final AtomicInteger count = new AtomicInteger();
 
     tokenMap.forEach((tokenAddress, treeSet) -> {
-      final BigInteger trc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
-      treeSet.forEach(accountAddress -> {
-        final BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
-        System.out.println(" >>> token:" + tokenAddress + ", acc:" + accountAddress + ",banlace:" + trc20Balance + ", dec:" + trc20Decimal);
+      try {
+        final BigInteger trc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
+        treeSet.forEach(accountAddress -> {
+          final BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
+          System.out.println(" >>> token:" + tokenAddress + ", acc:" + accountAddress + ",banlace:" + trc20Balance + ", dec:" + trc20Decimal);
 
-        count.incrementAndGet();
-//        syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
-      });
+          count.incrementAndGet();
+  //        syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
+        });
 
-      if (count.get() > 10000) {
-        return;
+        if (count.get() > 10000) {
+          return;
+        }
+      }
+      catch (Exception ex) {
+        logger.error(ex.getMessage(), ex);
       }
     });
   }
@@ -326,8 +331,10 @@ public class FullNode {
   public static BigInteger getTRC20Decimal(String contractAddress, BlockCapsule baseBlockCap) {
     byte[] data = Hex.decode("313ce567");
     ProgramResult result = triggerFromVM(contractAddress, data, baseBlockCap);
-    if (result != null && result.getResultCode().equals(Protocol.Transaction.Result.contractResult.SUCCESS) && !result.isRevert() && StringUtils
-            .isEmpty(result.getRuntimeError())
+    System.out.println( " >>> result" + result);
+    if (result != null && result.getResultCode() != null
+            && Objects.equals(result.getResultCode(), Protocol.Transaction.Result.contractResult.SUCCESS)
+            && !result.isRevert() && StringUtils.isEmpty(result.getRuntimeError())
             && result.getHReturn() != null) {
       try {
         BigInteger ret = toBigInteger(result.getHReturn());
