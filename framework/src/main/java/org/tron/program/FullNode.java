@@ -153,7 +153,7 @@ public class FullNode {
 
   private static void handlerMapToDB(Map<String, Set<String>> tokenMap, long headBlockNum) {
     final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
-    SyncDataToDB syncDataToDB = new SyncDataToDB();
+//    SyncDataToDB syncDataToDB = new SyncDataToDB();
     final AtomicInteger count = new AtomicInteger();
 
     tokenMap.forEach((tokenAddress, treeSet) -> {
@@ -176,7 +176,7 @@ public class FullNode {
     long l1 = System.currentTimeMillis();
 
 
-    LongStream.range(headBlockNum - 500000, headBlockNum).forEach(item -> {
+    LongStream.range(headBlockNum - 500000, headBlockNum - 10000).forEach(item -> {
       parseTrc20Map(item, tokenMap);
 
       if (item % 10000 == 0) {
