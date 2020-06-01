@@ -101,7 +101,7 @@ public class SyncDataToDB {
   private Jedis getConn() {
     Jedis jedis = new Jedis("localhost", 63791);
     System.out.println("Connected to Redis");
-    jedis.auth(null);
+    jedis.auth("");
     return jedis;
   }
 
