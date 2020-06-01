@@ -132,7 +132,7 @@ public class FullNode {
     final long headBlockNum = dbManager.getHeadBlockNum();
     System.out.println(" >>>>>>>>>>> headBlockNum" + headBlockNum);
 
-    Map<String, Set<String>> tokenMap = new ConcurrentHashMap<>();
+    Map<String, Map<String, Long>> tokenMap = new ConcurrentHashMap<>();
     handlerMap(headBlockNum, tokenMap);
     System.out.println(" >>> tokenMap.size:{}" + tokenMap.keySet().size());
 
@@ -151,15 +151,16 @@ public class FullNode {
     System.exit(0);
   }
 
-  private static void handlerMapToDB(Map<String, Set<String>> tokenMap, long headBlockNum) {
-    final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
+  private static void handlerMapToDB(Map<String, Map<String, Long>> tokenMap, long headBlockNum) {
+//    final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
 //    SyncDataToDB syncDataToDB = new SyncDataToDB();
     final AtomicInteger count = new AtomicInteger();
 
     tokenMap.forEach((tokenAddress, treeSet) -> {
       try {
-        final BigInteger trc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
-        treeSet.forEach(accountAddress -> {
+        treeSet.forEach((accountAddress, blockNum) -> {
+          BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
+          final BigInteger trc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
           final BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
           System.out.println(" >>> token:" + tokenAddress + ", acc:" + accountAddress + ",banlace:" + trc20Balance + ", dec:" + trc20Decimal);
 
@@ -167,7 +168,7 @@ public class FullNode {
   //        syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
         });
 
-        if (count.get() > 10000) {
+        if (count.get() > 100) {
           return;
         }
       }
@@ -177,7 +178,7 @@ public class FullNode {
     });
   }
 
-  private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
+  private static void handlerMap(long headBlockNum, Map<String, Map<String, Long>> tokenMap) {
     long l1 = System.currentTimeMillis();
 
 
@@ -263,7 +264,7 @@ public class FullNode {
     return ret;
   }
 
-  public static void parseTrc20Map(Long blockNum, Map<String, Set<String>> tokenMap) {
+  public static void parseTrc20Map(Long blockNum, Map<String, Map<String, Long>> tokenMap) {
     try {
       TransactionRetCapsule retCapsule = transactionRetStore
               .getTransactionInfoByBlockNum(ByteArray.fromLong(blockNum));
@@ -271,7 +272,7 @@ public class FullNode {
         for (Protocol.TransactionInfo transactionResultInfo : retCapsule.getInstance().getTransactioninfoList()) {
           List<Protocol.TransactionInfo.Log> logs = transactionResultInfo.getLogList();
           for (Protocol.TransactionInfo.Log l : logs) {
-            handlerToMap(l, tokenMap);
+            handlerToMap(blockNum, l, tokenMap);
           }
         }
       }
@@ -280,7 +281,8 @@ public class FullNode {
     }
   }
 
-  private static void handlerToMap(Protocol.TransactionInfo.Log log, Map<String, Set<String>> tokenMap) {
+  private static void handlerToMap(Long blockNum, Protocol.TransactionInfo.Log log,
+                                   Map<String, Map<String, Long>> tokenMap) {
     final List<ByteString> topicsList = log.getTopicsList();
 
     if (CollectionUtils.isEmpty(topicsList) || topicsList.size() < 3) {
@@ -301,14 +303,14 @@ public class FullNode {
     String tokenAddress = MUtil
             .encode58Check(MUtil.convertToTronAddress(log.getAddress().toByteArray()));
 
-    Set<String> treeSet = tokenMap.get(tokenAddress);
+    Map<String, Long> treeSet = tokenMap.get(tokenAddress);
     if (treeSet == null) {
-      treeSet = ConcurrentHashMap.newKeySet();
+      treeSet = new ConcurrentHashMap();
       tokenMap.put(tokenAddress, treeSet);
     }
 
-    treeSet.add(senderAddr);
-    treeSet.add(recAddr);
+    treeSet.put(senderAddr, blockNum);
+    treeSet.put(recAddr, blockNum);
   }
 
   public static BigInteger getTRC20Balance(String ownerAddress, String contractAddress,
