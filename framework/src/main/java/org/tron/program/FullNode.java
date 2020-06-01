@@ -321,8 +321,7 @@ public class FullNode {
     byte[] data = Bytes.concat(Hex.decode("70a082310000000000000000000000"),
             Commons.decodeFromBase58Check(ownerAddress));
     ProgramResult result = triggerFromVM(contractAddress, data, baseBlockCap);
-    if (result != null && result.getResultCode() != null
-            && Objects.equals(result.getResultCode(), Protocol.Transaction.Result.contractResult.SUCCESS)
+    if (result != null
             &&!result.isRevert() && StringUtils.isEmpty(result.getRuntimeError())
             && result.getHReturn() != null) {
       try {
@@ -337,8 +336,7 @@ public class FullNode {
   public static BigInteger getTRC20Decimal(String contractAddress, BlockCapsule baseBlockCap) {
     byte[] data = Hex.decode("313ce567");
     ProgramResult result = triggerFromVM(contractAddress, data, baseBlockCap);
-    if (result != null && result.getResultCode() != null
-            && Objects.equals(result.getResultCode(), Protocol.Transaction.Result.contractResult.SUCCESS)
+    if (result != null
             && !result.isRevert() && StringUtils.isEmpty(result.getRuntimeError())
             && result.getHReturn() != null) {
       try {
