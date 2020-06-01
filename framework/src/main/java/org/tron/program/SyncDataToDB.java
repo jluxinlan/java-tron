@@ -72,7 +72,6 @@ public class SyncDataToDB {
       preparedStatement.setTimestamp(8, now);
       preparedStatement.setTimestamp(9, now);
       preparedStatement.executeUpdate();
-      connection.commit();
     } catch (SQLException e) {
       logger.error(" insert error, num:" + blockNum + ", account:" + accountAddress + ", token:" + tokenAddress, e);
     }
@@ -92,7 +91,6 @@ public class SyncDataToDB {
       preparedStatement.setTimestamp(6, now);
       preparedStatement.setLong(7, id);
       preparedStatement.executeUpdate();
-      connection.commit();
     } catch (SQLException e) {
       logger.error(" update error, num:" + blockNum + ", id:" + id,  e);
     }
