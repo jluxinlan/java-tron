@@ -23,10 +23,11 @@ public class SyncDataToDB {
 
       Class.forName("com.mysql.jdbc.Driver");
       // Setup the connection with the DB
-      connect = DriverManager.getConnection(uri, userName, password);
+      connect = DriverManager.getConnection(uri, userName, null);
       connect.setAutoCommit(true);
       return connect;
     } catch (Exception e) {
+      System.out.println(" >>> create conn error");
       logger.error(e.getMessage(), e);
     }
 
@@ -70,7 +71,8 @@ public class SyncDataToDB {
       Timestamp now = Timestamp.valueOf(LocalDateTime.now());
       preparedStatement.setTimestamp(8, now);
       preparedStatement.setTimestamp(9, now);
-      preparedStatement.execute();
+      preparedStatement.executeUpdate();
+      connection.commit();
     } catch (SQLException e) {
       logger.error(" insert error, num:" + blockNum + ", account:" + accountAddress + ", token:" + tokenAddress, e);
     }
@@ -89,7 +91,8 @@ public class SyncDataToDB {
       Timestamp now = Timestamp.valueOf(LocalDateTime.now());
       preparedStatement.setTimestamp(6, now);
       preparedStatement.setLong(7, id);
-      preparedStatement.execute();
+      preparedStatement.executeUpdate();
+      connection.commit();
     } catch (SQLException e) {
       logger.error(" update error, num:" + blockNum + ", id:" + id,  e);
     }

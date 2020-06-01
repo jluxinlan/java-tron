@@ -170,7 +170,6 @@ public class FullNode {
           final BigInteger trc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
           final BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
           System.out.println(" >>> token:" + tokenAddress + ", acc:" + accountAddress + ",banlace:" + trc20Balance + ", dec:" + trc20Decimal);
-
           syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
         });
 
@@ -379,11 +378,6 @@ public class FullNode {
     }
 
     ProgramResult result = context.getProgramResult();
-    if (result != null) {
-      System.out.println("  >>> rsult:" + result.getResultCode() + ", " + result.isRevert()
-              + ", " + result.getRuntimeError() + ", " + result.getHReturn());
-    }
-
     return result;
   }
 
