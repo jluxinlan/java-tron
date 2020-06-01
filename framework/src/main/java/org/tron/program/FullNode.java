@@ -77,6 +77,7 @@ public class FullNode {
   private static TransactionHistoryStore transactionHistoryStore;
   private static BlockStore blockStore;
   private static BlockIndexStore blockIndexStore;
+  private static SyncDataToDB syncDataToDB = new SyncDataToDB();;
 
 
   /**
@@ -127,8 +128,6 @@ public class FullNode {
     transactionRetStore = dbManager.getTransactionRetStore();
     transactionHistoryStore = dbManager.getTransactionHistoryStore();
 
-
-
     final long headBlockNum = dbManager.getHeadBlockNum();
     System.out.println(" >>>>>>>>>>> headBlockNum" + headBlockNum);
 
@@ -136,16 +135,12 @@ public class FullNode {
     handlerMap(headBlockNum, tokenMap);
     System.out.println(" >>> tokenMap.size:{}" + tokenMap.keySet().size());
 
-//    final long count = tokenMap.entrySet().stream().mapToInt(item -> item.getValue().size()).count();
-//    tokenMap.forEach((k, v) -> {
-//      System.out.println(" >>>>>>>> tokenMap,k:" + k + ", set.size:" + v.size());
-//    });
     final long sum = tokenMap.values().stream().mapToLong(item -> item.size()).sum();
     System.out.println(" >>> tokenMap.size:{}" + sum);
-//    System.out.println(" >>> tokenMap.val.size:{}" + count);
 
     handlerMapToDB(headBlockNum, tokenMap);
-
+    final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
+    syncDataToDB.syncDataToRedis(blockCapsule);
 
     System.out.println(" >>>>>>>>>>> main is end!!!!!!!!");
     System.exit(0);
@@ -153,7 +148,6 @@ public class FullNode {
 
   private static void handlerMapToDB(long headBlockNum, Map<String, Map<String, Long>> tokenMap) {
     final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
-    SyncDataToDB syncDataToDB = new SyncDataToDB();
     final AtomicInteger count = new AtomicInteger();
 
     tokenMap.forEach((tokenAddress, treeSet) -> {
@@ -178,8 +172,6 @@ public class FullNode {
         logger.error(ex.getMessage(), ex);
       }
     });
-
-    syncDataToDB.syncDataToRedis(blockCapsule);
   }
 
   private static void handlerMap(long headBlockNum, Map<String, Map<String, Long>> tokenMap) {
