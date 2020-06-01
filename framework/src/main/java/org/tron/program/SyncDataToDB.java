@@ -100,9 +100,9 @@ public class SyncDataToDB {
 
   private Jedis getConn() {
     Jedis jedis = new Jedis("127.0.0.1", 63791);
+    jedis.auth("defi-redis");
 //    Jedis jedis = new Jedis("127.0.0.1");
     System.out.println("Connected to Redis");
-//    jedis.auth("");
     return jedis;
   }
 
