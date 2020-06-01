@@ -185,10 +185,10 @@ public class FullNode {
     long l1 = System.currentTimeMillis();
 
 
-    LongStream.range(headBlockNum - 100000, headBlockNum - 10000).forEach(item -> {
+    LongStream.range(headBlockNum - 50000, headBlockNum - 10000).forEach(item -> {
       parseTrc20Map(item, tokenMap);
 
-      if (item % 10000 == 0) {
+      if (item % 1000 == 0) {
         System.out.println(" >>>>>>>>>>> handlerMap, num:" + item + ", time:" + System.currentTimeMillis());
       }
     });
@@ -337,7 +337,6 @@ public class FullNode {
   public static BigInteger getTRC20Decimal(String contractAddress, BlockCapsule baseBlockCap) {
     byte[] data = Hex.decode("313ce567");
     ProgramResult result = triggerFromVM(contractAddress, data, baseBlockCap);
-    System.out.println( " >>> result" + result);
     if (result != null && result.getResultCode() != null
             && Objects.equals(result.getResultCode(), Protocol.Transaction.Result.contractResult.SUCCESS)
             && !result.isRevert() && StringUtils.isEmpty(result.getRuntimeError())
@@ -382,6 +381,11 @@ public class FullNode {
     }
 
     ProgramResult result = context.getProgramResult();
+    if (result != null) {
+      System.out.println("  >>> rsult:" + result.getResultCode() + ", " + result.isRevert()
+              + ", " + result.getRuntimeError() + ", " + result.getHReturn());
+    }
+
     return result;
   }
 
