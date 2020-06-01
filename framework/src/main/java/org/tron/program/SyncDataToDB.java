@@ -79,6 +79,10 @@ public class SyncDataToDB {
     }
   }
 
+  // todo insert his表？？？
+  private static final String insertHisSql = "insert into balance_info_his (account_address, token_address, balance, block_num, decimals, created_time) values (?, ?, ?, ?, ?, ?)";
+
+
   private static final String updatSql = "update balance_info set balance =?, block_num =?, solidity_balance =?, solidity_block_num =?, decimals=?, updated_time =?  where id = ?";
   private void update (Connection connection, Long id, Long blockNum, BigInteger balance, Integer decimals) {
     PreparedStatement preparedStatement = null;

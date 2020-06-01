@@ -127,10 +127,10 @@ public class FullNode {
     transactionRetStore = dbManager.getTransactionRetStore();
     transactionHistoryStore = dbManager.getTransactionHistoryStore();
 
-    final long headBlockNum = dbManager.getHeadBlockNum();
+    final long headBlockNum = 2000 * 10000;
     System.out.println(" >>>>>>>>>>> headBlockNum" + headBlockNum);
 
-    Map<String, Map<String, Long>> tokenMap = new ConcurrentHashMap<>();
+    Map<String, Set<String>> tokenMap = new ConcurrentHashMap<>();
     handlerMap(headBlockNum, tokenMap);
     System.out.println(" >>> tokenMap.size:{}" + tokenMap.keySet().size());
 
@@ -145,27 +145,21 @@ public class FullNode {
     System.exit(0);
   }
 
-  private static void handlerMapToDB(long headBlockNum, Map<String, Map<String, Long>> tokenMap) {
+  private static void handlerMapToDB(long headBlockNum, Map<String, Set<String>> tokenMap) {
     final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
     final AtomicInteger count = new AtomicInteger();
 
     tokenMap.forEach((tokenAddress, treeSet) -> {
       try {
-        if (count.get() > 100) {
-          return;
-        }
-
-        treeSet.forEach((accountAddress, blockNum) -> {
-          if (count.getAndIncrement() > 100) {
-            return;
-          }
-//          BlockCapsule blockCapsule = getBlockByNum(blockNum);
-          final BigInteger trc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
+        final BigInteger trc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
+        treeSet.forEach(accountAddress -> {
           final BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
-          System.out.println(" >>> token:" + tokenAddress + ", acc:" + accountAddress + ",banlace:" + trc20Balance + ", dec:" + trc20Decimal);
           syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
-        });
 
+          if (count.incrementAndGet() % (10 * 10000) == 0) {
+            System.out.println(" >>> token:" + tokenAddress + ", dec:" + trc20Decimal + ", time:" + System.currentTimeMillis());
+          }
+        });
       }
       catch (Exception ex) {
         logger.error(ex.getMessage(), ex);
@@ -173,26 +167,18 @@ public class FullNode {
     });
   }
 
-  private static void handlerMap(long headBlockNum, Map<String, Map<String, Long>> tokenMap) {
+  private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
     long l1 = System.currentTimeMillis();
 
+    for (long num = 1000 * 10000; num <= 2000 * 10000; num++) {
+      parseTrc20Map(num, tokenMap);
 
-    LongStream.range(headBlockNum - 50000, headBlockNum - 10000).forEach(item -> {
-      parseTrc20Map(item, tokenMap);
-
-      if (item % 1000 == 0) {
-        System.out.println(" >>>>>>>>>>> handlerMap, num:" + item + ", time:" + System.currentTimeMillis());
+      if (num % (10 * 10000) == 0) {
+        long l2 = System.currentTimeMillis();
+        System.out.println(" >>>>>>>>>>> handlerMap, num:" + num + ", time:" + (l2 - l1));
+        l1 = l2;
       }
-    });
-//    for (long num = 1; num <= headBlockNum; num++) {
-//      parseTrc20Map(num, tokenMap);
-//
-//      if (num % 10000 == 0) {
-//        long l2 = System.currentTimeMillis();
-//        System.out.println(" >>>>>>>>>>> handlerMap, num:" + num + ", time:" + (l2 - l1));
-//        l1 = l2;
-//      }
-//    }
+    }
   }
 
   private static BlockCapsule getBlockByNum(long num) {
@@ -205,7 +191,7 @@ public class FullNode {
     return blockCapsule;
   }
 
-  public static void parseTrc20Map(Long blockNum, Map<String, Map<String, Long>> tokenMap) {
+  public static void parseTrc20Map(Long blockNum, Map<String, Set<String>> tokenMap) {
     try {
       TransactionRetCapsule retCapsule = transactionRetStore
               .getTransactionInfoByBlockNum(ByteArray.fromLong(blockNum));
@@ -223,7 +209,7 @@ public class FullNode {
   }
 
   private static void handlerToMap(Long blockNum, Protocol.TransactionInfo.Log log,
-                                   Map<String, Map<String, Long>> tokenMap) {
+                                   Map<String, Set<String>> tokenMap) {
     final List<ByteString> topicsList = log.getTopicsList();
 
     if (CollectionUtils.isEmpty(topicsList) || topicsList.size() < 3) {
@@ -244,14 +230,14 @@ public class FullNode {
     String tokenAddress = MUtil
             .encode58Check(MUtil.convertToTronAddress(log.getAddress().toByteArray()));
 
-    Map<String, Long> treeSet = tokenMap.get(tokenAddress);
+    Set<String> treeSet = tokenMap.get(tokenAddress);
     if (treeSet == null) {
-      treeSet = new ConcurrentHashMap();
+      treeSet = ConcurrentHashMap.newKeySet();
       tokenMap.put(tokenAddress, treeSet);
     }
 
-    treeSet.put(senderAddr, blockNum);
-    treeSet.put(recAddr, blockNum);
+    treeSet.add(senderAddr);
+    treeSet.add(recAddr);
   }
 
   private static BigInteger getTRC20Balance(String ownerAddress, String contractAddress,
