@@ -219,12 +219,12 @@ public class FullNode {
       TransactionRetCapsule retCapsule = transactionRetStore
               .getTransactionInfoByBlockNum(ByteArray.fromLong(blockNum));
       if (retCapsule != null) {
-        for (Protocol.TransactionInfo transactionResultInfo : retCapsule.getInstance().getTransactioninfoList()) {
-          List<Protocol.TransactionInfo.Log> logs = transactionResultInfo.getLogList();
+        retCapsule.getInstance().getTransactioninfoList().parallelStream().forEach(item -> {
+          List<Protocol.TransactionInfo.Log> logs = item.getLogList();
           for (Protocol.TransactionInfo.Log l : logs) {
             handlerToMap(blockNum, l, tokenMap);
           }
-        }
+        });
       }
     } catch (BadItemException e) {
       logger.error("TRC20Parser: block: {} parse error ", blockNum);
@@ -263,7 +263,7 @@ public class FullNode {
     treeSet.put(recAddr, blockNum);
   }
 
-  public static BigInteger getTRC20Balance(String ownerAddress, String contractAddress,
+  private static BigInteger getTRC20Balance(String ownerAddress, String contractAddress,
                                            BlockCapsule baseBlockCap) {
     byte[] data = Bytes.concat(Hex.decode("70a082310000000000000000000000"),
             Commons.decodeFromBase58Check(ownerAddress));
@@ -280,7 +280,7 @@ public class FullNode {
     return null;
   }
 
-  public static BigInteger getTRC20Decimal(String contractAddress, BlockCapsule baseBlockCap) {
+  private static BigInteger getTRC20Decimal(String contractAddress, BlockCapsule baseBlockCap) {
     byte[] data = Hex.decode("313ce567");
     ProgramResult result = triggerFromVM(contractAddress, data, baseBlockCap);
     if (result != null
@@ -340,7 +340,7 @@ public class FullNode {
     return null;
   }
 
-  public static BigInteger hexStrToBigInteger(String hexStr) {
+  private static BigInteger hexStrToBigInteger(String hexStr) {
     if (!StringUtils.isEmpty(hexStr)) {
       try {
         return new BigInteger(hexStr, 16);
@@ -352,7 +352,7 @@ public class FullNode {
 
 
   @Data
-  public static class AssetStatusPojo {
+  private static class AssetStatusPojo {
     private String accountAddress;
     private String tokenAddress;
     private String balance;
@@ -360,7 +360,7 @@ public class FullNode {
     private String decimals;
   }
 
-  public static enum ConcernTopics {
+  private static enum ConcernTopics {
     TRANSFER("Transfer(address,address,uint256)",
             "ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
 
