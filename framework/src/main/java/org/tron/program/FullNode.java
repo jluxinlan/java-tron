@@ -153,7 +153,7 @@ public class FullNode {
 
   private static void handlerMapToDB(long headBlockNum, Map<String, Map<String, Long>> tokenMap) {
     final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
-//    SyncDataToDB syncDataToDB = new SyncDataToDB();
+    SyncDataToDB syncDataToDB = new SyncDataToDB();
     final AtomicInteger count = new AtomicInteger();
 
     tokenMap.forEach((tokenAddress, treeSet) -> {
@@ -171,7 +171,7 @@ public class FullNode {
           final BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
           System.out.println(" >>> token:" + tokenAddress + ", acc:" + accountAddress + ",banlace:" + trc20Balance + ", dec:" + trc20Decimal);
 
-  //        syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
+          syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
         });
 
       }
