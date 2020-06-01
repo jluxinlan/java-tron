@@ -111,13 +111,19 @@ public class SyncDataToDB {
   public static final String BLOCK_CURRENT_SOLIDITY_NUM = "tron-link-current-solidity-num";
 
   public void syncDataToRedis(BlockCapsule blockCapsule) {
-    final Jedis conn = getConn();
-    conn.set(INIT_KEY, "true");
-    conn.set(BLOCK_CURRENT_NUM, "" + blockCapsule.getNum());
-    conn.set(BLOCK_CURRENT_HASH, "" + blockCapsule.getBlockId().toString());
-    conn.set(BLOCK_CURRENT_SOLIDITY_NUM, "" + blockCapsule.getNum());
-    System.out.println(" >>>>> syncDataToRedis success. num:" + blockCapsule.getNum());
-    // todo blockInfo 不设置
-//    conn.set(blockCapsule.getBlockId().toString(), null);
+    try {
+      final Jedis conn = getConn();
+      conn.set(INIT_KEY, "true");
+      conn.set(BLOCK_CURRENT_NUM, "" + blockCapsule.getNum());
+      conn.set(BLOCK_CURRENT_HASH, "" + blockCapsule.getBlockId().toString());
+      conn.set(BLOCK_CURRENT_SOLIDITY_NUM, "" + blockCapsule.getNum());
+      System.out.println(" >>>>> syncDataToRedis success. num:" + blockCapsule.getNum());
+      // todo blockInfo 不设置
+  //    conn.set(blockCapsule.getBlockId().toString(), null);
+    }
+    catch (Exception ex) {
+      System.out.println(" >>>> update redis error !!!");
+      logger.error(" update redis error, num:" + blockCapsule.getNum(),  ex);
+    }
   }
 }

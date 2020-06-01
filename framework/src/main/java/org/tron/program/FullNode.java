@@ -350,16 +350,6 @@ public class FullNode {
     return null;
   }
 
-
-  @Data
-  private static class AssetStatusPojo {
-    private String accountAddress;
-    private String tokenAddress;
-    private String balance;
-    private String incrementBalance;
-    private String decimals;
-  }
-
   private static enum ConcernTopics {
     TRANSFER("Transfer(address,address,uint256)",
             "ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
