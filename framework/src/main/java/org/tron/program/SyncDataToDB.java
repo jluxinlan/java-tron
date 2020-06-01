@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class SyncDataToDB {
 
-  private static String uri = "jdbc:mysql://localhost:3306/tronlink_dev";
+  private static String uri = "jdbc:mysql://127.0.0.1:33067/tronlink_dev";
   private static String userName = "root";
   private static String password = "";
 
