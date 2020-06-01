@@ -178,6 +178,8 @@ public class FullNode {
         logger.error(ex.getMessage(), ex);
       }
     });
+
+    syncDataToDB.syncDataToRedis(blockCapsule);
   }
 
   private static void handlerMap(long headBlockNum, Map<String, Map<String, Long>> tokenMap) {
@@ -210,60 +212,6 @@ public class FullNode {
       logger.error(" >>> get block error, num:{}", num);
     }
     return blockCapsule;
-  }
-
-  private static List<Protocol.TransactionInfo> getTransactioninfoList(BlockCapsule blockCapsule) {
-    List<Protocol.TransactionInfo> ret = new ArrayList<>();
-    Map<ByteString, Protocol.TransactionInfo> retMap = new HashMap<>();
-    TransactionRetCapsule retCapsule = null;
-    try {
-      retCapsule = transactionRetStore
-              .getTransactionInfoByBlockNum(ByteArray.fromLong(blockCapsule.getNum()));
-      if (retCapsule != null) {
-        for (Protocol.TransactionInfo transactionResultInfo : retCapsule.getInstance()
-                .getTransactioninfoList()) {
-          ret.add(transactionResultInfo);
-          retMap.put(transactionResultInfo.getId(), transactionResultInfo);
-        }
-      }
-    } catch (BadItemException e) {
-      logger.error("TRC20Parser: block: {} parse error ", blockCapsule.getNum());
-    }
-    //front check: if ret.size == block inner tx size
-    if (blockCapsule.getTransactions().size() != ret.size()) {
-      for (TransactionCapsule capsule : blockCapsule.getTransactions()) {
-        if (retMap.get(capsule.getTransactionId().getByteString()) == null) {
-          try {
-            TransactionInfoCapsule infoCapsule = transactionHistoryStore
-                    .get(capsule.getTransactionId().getBytes());
-            if (infoCapsule != null) {
-              ret.add(infoCapsule.getInstance());
-            }
-          } catch (BadItemException e) {
-            logger.error("TRC20Parser: txid: {} parse from transactionHistoryStore error ",
-                    capsule.getTransactionId());
-          }
-        }
-      }
-    }
-    return ret;
-  }
-
-  private static List<LogInfo> getLogInfoList(List<Protocol.TransactionInfo> transactionInfos) {
-    List<LogInfo> ret = new ArrayList<>();
-    for (Protocol.TransactionInfo transactionInfo : transactionInfos) {
-      List<Protocol.TransactionInfo.Log> logs = transactionInfo.getLogList();
-      for (Protocol.TransactionInfo.Log l : logs) {
-        List<DataWord> topics = new ArrayList<>();
-        for (ByteString b : l.getTopicsList()) {
-          topics.add(new DataWord(b.toByteArray()));
-        }
-        LogInfo logInfo = new LogInfo(l.getAddress().toByteArray(), topics,
-                l.getData().toByteArray());
-        ret.add(logInfo);
-      }
-    }
-    return ret;
   }
 
   public static void parseTrc20Map(Long blockNum, Map<String, Map<String, Long>> tokenMap) {
@@ -392,13 +340,6 @@ public class FullNode {
     return null;
   }
 
-  private static String bigIntegertoString(BigInteger bigInteger) {
-    if (bigInteger != null) {
-      return bigInteger.toString();
-    }
-    return null;
-  }
-
   public static BigInteger hexStrToBigInteger(String hexStr) {
     if (!StringUtils.isEmpty(hexStr)) {
       try {
@@ -410,10 +351,8 @@ public class FullNode {
   }
 
 
-
   @Data
   public static class AssetStatusPojo {
-
     private String accountAddress;
     private String tokenAddress;
     private String balance;
@@ -430,12 +369,10 @@ public class FullNode {
     @Getter
     private String signHash;
 
-
     ConcernTopics(String sign, String signHash) {
       this.sign = sign;
       this.signHash = signHash;
     }
-
   }
 
   public static void shutdown(final Application app) {

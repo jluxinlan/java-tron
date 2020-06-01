@@ -1,6 +1,8 @@
 package org.tron.program;
 
 import lombok.extern.slf4j.Slf4j;
+import org.tron.core.capsule.BlockCapsule;
+import redis.clients.jedis.Jedis;
 
 import java.math.BigInteger;
 import java.sql.*;
@@ -94,5 +96,27 @@ public class SyncDataToDB {
     } catch (SQLException e) {
       logger.error(" update error, num:" + blockNum + ", id:" + id,  e);
     }
+  }
+
+  private Jedis getConn() {
+    Jedis jedis = new Jedis("localhost", 63791);
+    System.out.println("Connected to Redis");
+    return jedis;
+  }
+
+  public static final String INIT_KEY = "tron-link-data-init";
+  public static final String BLOCK_CURRENT_NUM = "tron-link-current-num";
+  public static final String BLOCK_CURRENT_HASH = "tron-link-current-hash";
+  public static final String BLOCK_CURRENT_SOLIDITY_NUM = "tron-link-current-solidity-num";
+
+  public void syncDataToRedis(BlockCapsule blockCapsule) {
+    final Jedis conn = getConn();
+    conn.set(INIT_KEY, "true");
+    conn.set(BLOCK_CURRENT_NUM, "" + blockCapsule.getNum());
+    conn.set(BLOCK_CURRENT_HASH, "" + blockCapsule.getBlockId().toString());
+    conn.set(BLOCK_CURRENT_SOLIDITY_NUM, "" + blockCapsule.getNum());
+    System.out.println(" >>>>> syncDataToRedis success. num:" + blockCapsule.getNum());
+    // todo blockInfo 不设置
+//    conn.set(blockCapsule.getBlockId().toString(), null);
   }
 }
