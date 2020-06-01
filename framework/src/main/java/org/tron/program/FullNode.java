@@ -88,7 +88,6 @@ public class FullNode {
 //    String dbPath = "/Users/tron/Downloads/output-directory";
     String dbPath = "/data/mainnetdb/output-directory";
     args = new String[] {"-d", dbPath};
-//    String conf = Constant.TESTNET_CONF;
 //    String conf = "/Users/tron/Downloads/main_net_config.conf";
     String conf = "/home/java-tron/main_net_config.conf";
     Args.setParam(args, conf);
