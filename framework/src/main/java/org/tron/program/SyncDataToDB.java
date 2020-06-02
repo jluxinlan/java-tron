@@ -58,7 +58,7 @@ public class SyncDataToDB {
     }
   }
 
-  private static final String insertSql = "insert into balance_info (account_address, token_address, balance, block_num, solidity_balance, solidity_block_num, decimals, created_time, updated_time) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  private static final String insertSql = "insert into balance_info (account_address, token_address, balance, block_num, solidity_balance, solidity_block_num, decimals, version, created_time, updated_time) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
   private void insert(Connection connection, String tokenAddress, String accountAddress, Long blockNum, BigInteger balance, Integer decimals) {
     PreparedStatement preparedStatement = null;
     try {
@@ -71,8 +71,9 @@ public class SyncDataToDB {
       preparedStatement.setLong(6, blockNum);
       preparedStatement.setInt(7, decimals);
       Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-      preparedStatement.setTimestamp(8, now);
+      preparedStatement.setLong(8, 1);
       preparedStatement.setTimestamp(9, now);
+      preparedStatement.setTimestamp(10, now);
       preparedStatement.executeUpdate();
     } catch (SQLException e) {
       logger.error(" insert error, num:" + blockNum + ", account:" + accountAddress + ", token:" + tokenAddress, e);
