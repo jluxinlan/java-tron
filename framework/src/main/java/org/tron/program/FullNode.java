@@ -130,15 +130,20 @@ public class FullNode {
     final long headBlockNum = 2000 * 10000;
     System.out.println(" >>>>>>>>>>> headBlockNum" + headBlockNum);
 
+    l1 = System.currentTimeMillis();
     Map<String, Set<String>> tokenMap = new ConcurrentHashMap<>();
     handlerMap(headBlockNum, tokenMap);
     System.out.println(" >>> tokenMap.size:{}" + tokenMap.keySet().size());
 
     final long sum = tokenMap.values().stream().mapToLong(item -> item.size()).sum();
-    System.out.println(" >>> tokenMap.size:{}" + sum);
+    l2 = System.currentTimeMillis();
+    System.out.println(" >>> tokenMap.size:{}" + sum + ", cost:" + (l2 - l1));
 
-    //todo 1844172 个要执行的数据， 执行一天没有执行完， 效率需要提升
+    l1 = System.currentTimeMillis();
     handlerMapToDB(headBlockNum, tokenMap);
+    l2 = System.currentTimeMillis();
+    System.out.println(" >>> handlerMapToDB, cost:{}" + (l2 - l1));
+
     final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
     syncDataToDB.syncDataToRedis(blockCapsule);
 
@@ -150,8 +155,10 @@ public class FullNode {
     final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
     final AtomicInteger count = new AtomicInteger();
 
-    tokenMap.forEach((tokenAddress, accountAddressSet) -> {
+    tokenMap.entrySet().parallelStream().forEach(entry -> {
       try {
+        String tokenAddress = entry.getKey();
+        final Set<String> accountAddressSet = entry.getValue();
         BigInteger oldTrc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
         final BigInteger trc20Decimal = oldTrc20Decimal == null ? BigInteger.ZERO : oldTrc20Decimal;
 
@@ -174,7 +181,7 @@ public class FullNode {
   private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
     long l1 = System.currentTimeMillis();
 
-    for (long num = 1000 * 10000; num <= 2000 * 10000; num++) {
+    for (long num = 1800 * 10000; num <= 2000 * 10000; num++) {
       parseTrc20Map(num, tokenMap);
 
       if (num % (10 * 10000) == 0) {
@@ -279,7 +286,7 @@ public class FullNode {
 
   }
 
-  //todo 1844172 个要执行的数据， 执行一天没有执行完， 效率需要提升
+  //todo 1844172 个要执行的数据， 效率需要提升
   private static ProgramResult triggerFromVM(String contractAddress, byte[] data,
                                              BlockCapsule baseBlockCap) {
     SmartContractOuterClass.TriggerSmartContract.Builder build = SmartContractOuterClass.TriggerSmartContract.newBuilder();
