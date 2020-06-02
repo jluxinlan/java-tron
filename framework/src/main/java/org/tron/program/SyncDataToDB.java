@@ -65,9 +65,9 @@ public class SyncDataToDB {
       preparedStatement = connection.prepareStatement(insertSql);
       preparedStatement.setString(1, accountAddress);
       preparedStatement.setString(2, tokenAddress);
-      preparedStatement.setString(3, balance == null ? "0": balance.toString());
+      preparedStatement.setString(3, balance.toString());
       preparedStatement.setLong(4, blockNum);
-      preparedStatement.setString(5, balance == null ? "0": balance.toString());
+      preparedStatement.setString(5, balance.toString());
       preparedStatement.setLong(6, blockNum);
       preparedStatement.setInt(7, decimals);
       Timestamp now = Timestamp.valueOf(LocalDateTime.now());
@@ -89,9 +89,9 @@ public class SyncDataToDB {
     PreparedStatement preparedStatement = null;
     try {
       preparedStatement = connection.prepareStatement(updatSql);
-      preparedStatement.setString(1, balance == null ? "0": balance.toString());
+      preparedStatement.setString(1, balance.toString());
       preparedStatement.setLong(2, blockNum);
-      preparedStatement.setString(3, balance == null ? "0": balance.toString());
+      preparedStatement.setString(3, balance.toString());
       preparedStatement.setLong(4, blockNum);
       preparedStatement.setInt(5, decimals);
       preparedStatement.setLong(6, 1);

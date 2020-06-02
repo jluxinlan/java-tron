@@ -69,7 +69,7 @@ public class FullNode {
       lc.reset();
       configurator.doConfigure(file);
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error("", e);
     }
   }
 
@@ -137,6 +137,7 @@ public class FullNode {
     final long sum = tokenMap.values().stream().mapToLong(item -> item.size()).sum();
     System.out.println(" >>> tokenMap.size:{}" + sum);
 
+    //todo 1844172 个要执行的数据， 执行一天没有执行完， 效率需要提升
     handlerMapToDB(headBlockNum, tokenMap);
     final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
     syncDataToDB.syncDataToRedis(blockCapsule);
@@ -149,11 +150,14 @@ public class FullNode {
     final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
     final AtomicInteger count = new AtomicInteger();
 
-    tokenMap.forEach((tokenAddress, treeSet) -> {
+    tokenMap.forEach((tokenAddress, accountAddressSet) -> {
       try {
-        final BigInteger trc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
-        treeSet.forEach(accountAddress -> {
-          final BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
+        BigInteger oldTrc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
+        final BigInteger trc20Decimal = oldTrc20Decimal == null ? BigInteger.ZERO : oldTrc20Decimal;
+
+        accountAddressSet.forEach(accountAddress -> {
+          BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
+          trc20Balance = trc20Balance == null ? BigInteger.ZERO : trc20Balance;
           syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
 
           if (count.incrementAndGet() % (10 * 10000) == 0) {
@@ -162,7 +166,7 @@ public class FullNode {
         });
       }
       catch (Exception ex) {
-        logger.error(ex.getMessage(), ex);
+        logger.error("", ex);
       }
     });
   }
@@ -252,6 +256,7 @@ public class FullNode {
         BigInteger ret = toBigInteger(result.getHReturn());
         return ret;
       } catch (Exception e) {
+        logger.error("", e);
       }
     }
     return null;
@@ -267,12 +272,14 @@ public class FullNode {
         BigInteger ret = toBigInteger(result.getHReturn());
         return ret;
       } catch (Exception e) {
+        logger.error("", e);
       }
     }
     return null;
 
   }
 
+  //todo 1844172 个要执行的数据， 执行一天没有执行完， 效率需要提升
   private static ProgramResult triggerFromVM(String contractAddress, byte[] data,
                                              BlockCapsule baseBlockCap) {
     SmartContractOuterClass.TriggerSmartContract.Builder build = SmartContractOuterClass.TriggerSmartContract.newBuilder();
