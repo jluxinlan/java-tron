@@ -150,14 +150,14 @@ public class FullNode {
     final AtomicInteger count = new AtomicInteger();
 
     final ConcurrentLinkedQueue<SyncDataToDB.BalanceInfo> queue = new ConcurrentLinkedQueue();
-    tokenMap.entrySet().parallelStream().forEach(entry -> {
+    tokenMap.entrySet().stream().forEach(entry -> {
       try {
         String tokenAddress = entry.getKey();
         final Set<String> accountAddressSet = entry.getValue();
         BigInteger oldTrc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
         final BigInteger trc20Decimal = oldTrc20Decimal == null ? BigInteger.ZERO : oldTrc20Decimal;
 
-        accountAddressSet.parallelStream().forEach(accountAddress -> {
+        accountAddressSet.stream().forEach(accountAddress -> {
           BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
           trc20Balance = trc20Balance == null ? BigInteger.ZERO : trc20Balance;
           final SyncDataToDB.BalanceInfo info = new SyncDataToDB.BalanceInfo(null, tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
