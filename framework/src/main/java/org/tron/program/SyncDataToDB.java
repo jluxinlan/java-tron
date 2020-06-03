@@ -90,27 +90,6 @@ public class SyncDataToDB {
   }
 
   private static final String insertSql = "insert into balance_info (account_address, token_address, balance, block_num, solidity_balance, solidity_block_num, decimals, version, created_time, updated_time) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-  private void insert(Connection connection, String tokenAddress, String accountAddress, Long blockNum, BigInteger balance, Integer decimals) {
-    PreparedStatement preparedStatement = null;
-    try {
-      preparedStatement = connection.prepareStatement(insertSql);
-      preparedStatement.setString(1, accountAddress);
-      preparedStatement.setString(2, tokenAddress);
-      preparedStatement.setString(3, balance.toString());
-      preparedStatement.setLong(4, blockNum);
-      preparedStatement.setString(5, balance.toString());
-      preparedStatement.setLong(6, blockNum);
-      preparedStatement.setInt(7, decimals);
-      Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-      preparedStatement.setLong(8, 1);
-      preparedStatement.setTimestamp(9, now);
-      preparedStatement.setTimestamp(10, now);
-      preparedStatement.executeUpdate();
-    } catch (SQLException e) {
-      logger.error(" insert error, num:" + blockNum + ", account:" + accountAddress + ", token:" + tokenAddress, e);
-    }
-  }
-
   private void insert(Connection connection, List<BalanceInfo> infos) {
     if (CollectionUtils.isEmpty(infos)) {
       return;
@@ -127,7 +106,7 @@ public class SyncDataToDB {
           preparedStatement.setLong(4, info.blockNum);
           preparedStatement.setString(5, info.balance.toString());
           preparedStatement.setLong(6, info.blockNum);
-          preparedStatement.setInt(7, info.decimals);
+          preparedStatement.setString(7, info.decimals.toString());
           Timestamp now = Timestamp.valueOf(LocalDateTime.now());
           preparedStatement.setLong(8, 1);
           preparedStatement.setTimestamp(9, now);
@@ -161,10 +140,10 @@ public class SyncDataToDB {
           preparedStatement.setLong(2, info.blockNum);
           preparedStatement.setString(3, info.balance.toString());
           preparedStatement.setLong(4, info.blockNum);
-          preparedStatement.setInt(5, info.decimals);
-          preparedStatement.setLong(6, 1);
+          preparedStatement.setString(5, info.decimals.toString());
           Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-          preparedStatement.setTimestamp(7, now);
+          preparedStatement.setTimestamp(6, now);
+          preparedStatement.setLong(7, info.id);
           preparedStatement.addBatch();
         }
         catch (Exception e) {
