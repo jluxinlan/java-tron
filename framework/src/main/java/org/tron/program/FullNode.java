@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.primitives.Bytes;
@@ -89,17 +90,6 @@ public class FullNode {
     load(parameter.getLogbackPath());
     System.out.println(" >>>>>>>>>>> load");
 
-    if (parameter.isHelp()) {
-      logger.info("Here is the help message.");
-      return;
-    }
-
-    if (Args.getInstance().isDebug()) {
-      logger.info("in debug mode, it won't check energy time");
-    } else {
-      logger.info("not in debug mode, it will check energy time");
-    }
-
     DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
     beanFactory.setAllowCircularReferences(false);
     TronApplicationContext context = new TronApplicationContext(beanFactory);
@@ -112,7 +102,6 @@ public class FullNode {
     System.out.println(" >>>>>>>>>>> context refresh, cost:" + (l2 - l1));
     Application appT = ApplicationFactory.create(context);
     shutdown(appT);
-    System.out.println(" >>>>>>>>>>> shutdown");
 
     final Manager dbManager = appT.getDbManager();
     blockStore = dbManager.getBlockStore();
@@ -120,25 +109,44 @@ public class FullNode {
     transactionRetStore = dbManager.getTransactionRetStore();
     transactionHistoryStore = dbManager.getTransactionHistoryStore();
 
-    final long headBlockNum = 2000 * 10000;
-    System.out.println(" >>>>>>>>>>> headBlockNum" + headBlockNum);
+    while (true) {
+      final long headBlockNum = dbManager.getHeadBlockNum();
+      System.out.println(" >>>>>>>>>>> headBlockNum:" + headBlockNum);
 
-    l1 = System.currentTimeMillis();
-    Map<String, Set<String>> tokenMap = new ConcurrentHashMap<>();
-    handlerMap(headBlockNum, tokenMap);
-    System.out.println(" >>> tokenMap.size:{}" + tokenMap.keySet().size());
+      try {
+        TimeUnit.SECONDS.sleep(3);
+      }
+      catch (Exception ex) {
+        ex.printStackTrace();
+      }
 
-    final long sum = tokenMap.values().stream().mapToLong(item -> item.size()).sum();
-    l2 = System.currentTimeMillis();
-    System.out.println(" >>> tokenMap.size:{}" + sum + ", cost:" + (l2 - l1));
+      l2 = System.currentTimeMillis();
 
-    l1 = System.currentTimeMillis();
-    handlerMapToDB(headBlockNum, tokenMap);
-    l2 = System.currentTimeMillis();
-    System.out.println(" >>> handlerMapToDB, cost:{}" + (l2 - l1));
+      if (l2 - l1 > 120000) {
+        break;
+      }
+    }
 
-    final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
-    syncDataToDB.syncDataToRedis(blockCapsule);
+//
+//    final long headBlockNum = 2000 * 10000;
+//    System.out.println(" >>>>>>>>>>> headBlockNum" + headBlockNum);
+//
+//    l1 = System.currentTimeMillis();
+//    Map<String, Set<String>> tokenMap = new ConcurrentHashMap<>();
+//    handlerMap(headBlockNum, tokenMap);
+//    System.out.println(" >>> tokenMap.size:{}" + tokenMap.keySet().size());
+//
+//    final long sum = tokenMap.values().stream().mapToLong(item -> item.size()).sum();
+//    l2 = System.currentTimeMillis();
+//    System.out.println(" >>> tokenMap.size:{}" + sum + ", cost:" + (l2 - l1));
+//
+//    l1 = System.currentTimeMillis();
+//    handlerMapToDB(headBlockNum, tokenMap);
+//    l2 = System.currentTimeMillis();
+//    System.out.println(" >>> handlerMapToDB, cost:{}" + (l2 - l1));
+//
+//    final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
+//    syncDataToDB.syncDataToRedis(blockCapsule);
 
     System.out.println(" >>>>>>>>>>> main is end!!!!!!!!");
     System.exit(0);
@@ -150,6 +158,7 @@ public class FullNode {
     final AtomicInteger count = new AtomicInteger();
 
     final ConcurrentLinkedQueue<SyncDataToDB.BalanceInfo> queue = new ConcurrentLinkedQueue();
+    // 并行流triggerVM会报错，这里不使用并行流
     tokenMap.entrySet().stream().forEach(entry -> {
       try {
         String tokenAddress = entry.getKey();
@@ -157,6 +166,7 @@ public class FullNode {
         BigInteger oldTrc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
         final BigInteger trc20Decimal = oldTrc20Decimal == null ? BigInteger.ZERO : oldTrc20Decimal;
 
+        // 并行流triggerVM会报错，这里不使用并行流
         accountAddressSet.stream().forEach(accountAddress -> {
           BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
           trc20Balance = trc20Balance == null ? BigInteger.ZERO : trc20Balance;
@@ -183,7 +193,7 @@ public class FullNode {
   private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
     long l1 = System.currentTimeMillis();
 
-    for (long num = 1000 * 10000; num <= 2000 * 10000; num++) {
+    for (long num = 1000 * 10000; num <= headBlockNum; num++) {
       parseTrc20Map(num, tokenMap);
 
       if (num % (10 * 10000) == 0) {
