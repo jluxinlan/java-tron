@@ -146,7 +146,7 @@ public class SyncDataToDB {
   }
 
 
-  private static final String updatSql = "update balance_info set balance =?, block_num =?, solidity_balance =?, solidity_block_num =?, decimals =?, version =? updated_time =?  where id = ?";
+  private static final String updatSql = "update balance_info set balance =?, block_num =?, solidity_balance =?, solidity_block_num =?, decimals =?, updated_time =?  where id = ?";
   private void update (Connection connection, List<BalanceInfo> infos) {
     try {
       if (CollectionUtils.isEmpty(infos)) {
