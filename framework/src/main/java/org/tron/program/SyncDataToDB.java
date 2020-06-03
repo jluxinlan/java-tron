@@ -30,7 +30,7 @@ public class SyncDataToDB {
         return connect;
       }
 
-      Class.forName("com.mysql.jdbc.Driver");
+      Class.forName("com.mysql.cj.jdbc.Driver");
       // Setup the connection with the DB
       connect = DriverManager.getConnection(uri, userName, null);
       connect.setAutoCommit(true);

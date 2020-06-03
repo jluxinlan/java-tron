@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.LongStream;
 
 import com.google.common.primitives.Bytes;
 import com.google.protobuf.ByteString;
@@ -172,17 +173,13 @@ public class FullNode {
   }
 
   private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
-    long l1 = System.currentTimeMillis();
-
-    for (long num = 1950 * 10000; num <= headBlockNum; num++) {
+    LongStream.range(1950 * 10000, headBlockNum + 1).parallel().forEach(num -> {
       parseTrc20Map(num, tokenMap);
 
       if (num % (10 * 10000) == 0) {
-        long l2 = System.currentTimeMillis();
-        System.out.println(" >>>>>>>>>>> handlerMap, num:" + num + ", time:" + (l2 - l1));
-        l1 = l2;
+        System.out.println(" >>>>>>>>>>> handlerMap, num:" + num );
       }
-    }
+    });
   }
 
   private static BlockCapsule getBlockByNum(long num) {
@@ -202,7 +199,7 @@ public class FullNode {
       if (retCapsule != null) {
         retCapsule.getInstance().getTransactioninfoList().parallelStream().forEach(item -> {
           List<Protocol.TransactionInfo.Log> logs = item.getLogList();
-          logs.forEach(l -> handlerToMap(l, tokenMap));
+          logs.parallelStream().forEach(l -> handlerToMap(l, tokenMap));
         });
       }
     } catch (BadItemException e) {
