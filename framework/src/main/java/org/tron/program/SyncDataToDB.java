@@ -61,9 +61,10 @@ public class SyncDataToDB {
       List<BalanceInfo> insertInfos = new LinkedList<>();
       List<BalanceInfo> updateInfos = new LinkedList<>();
 
-      queue.stream().forEach(info -> {
+      PreparedStatement statement = connection.prepareStatement(querySql);
+      while (!queue.isEmpty()) {
         try {
-          PreparedStatement statement = connection.prepareStatement(querySql);
+          BalanceInfo info = queue.poll();
           statement.setString(1, info.getAccountAddress());
           statement.setString(2, info.getTokenAddress());
           final ResultSet resultSet = statement.executeQuery();
@@ -79,7 +80,7 @@ public class SyncDataToDB {
         } catch (SQLException e) {
           e.printStackTrace();
         }
-      });
+      }
 
       insert(connection, insertInfos);
       update(connection, updateInfos);
