@@ -181,7 +181,7 @@ public class FullNode {
   private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
     long l1 = System.currentTimeMillis();
 
-    for (long num = 1950 * 10000; num <= 2000 * 10000; num++) {
+    for (long num = 1000 * 10000; num <= 2000 * 10000; num++) {
       parseTrc20Map(num, tokenMap);
 
       if (num % (10 * 10000) == 0) {
@@ -209,7 +209,7 @@ public class FullNode {
       if (retCapsule != null) {
         retCapsule.getInstance().getTransactioninfoList().parallelStream().forEach(item -> {
           List<Protocol.TransactionInfo.Log> logs = item.getLogList();
-          logs.parallelStream().forEach(l -> handlerToMap(l, tokenMap));
+          logs.forEach(l -> handlerToMap(l, tokenMap));
         });
       }
     } catch (BadItemException e) {
