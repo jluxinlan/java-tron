@@ -109,44 +109,25 @@ public class FullNode {
     transactionRetStore = dbManager.getTransactionRetStore();
     transactionHistoryStore = dbManager.getTransactionHistoryStore();
 
-    while (true) {
-      final long headBlockNum = dbManager.getHeadBlockNum();
-      System.out.println(" >>>>>>>>>>> headBlockNum:" + headBlockNum);
+    final long headBlockNum = dbManager.getHeadBlockNum();
+    System.out.println(" >>>>>>>>>>> headBlockNum" + headBlockNum);
 
-      try {
-        TimeUnit.SECONDS.sleep(3);
-      }
-      catch (Exception ex) {
-        ex.printStackTrace();
-      }
+    l1 = System.currentTimeMillis();
+    Map<String, Set<String>> tokenMap = new ConcurrentHashMap<>();
+    handlerMap(headBlockNum, tokenMap);
+    System.out.println(" >>> tokenMap.size:{}" + tokenMap.keySet().size());
 
-      l2 = System.currentTimeMillis();
+    final long sum = tokenMap.values().stream().mapToLong(item -> item.size()).sum();
+    l2 = System.currentTimeMillis();
+    System.out.println(" >>> tokenMap.size:{}" + sum + ", cost:" + (l2 - l1));
 
-      if (l2 - l1 > 120000) {
-        break;
-      }
-    }
+    l1 = System.currentTimeMillis();
+    handlerMapToDB(headBlockNum, tokenMap);
+    l2 = System.currentTimeMillis();
+    System.out.println(" >>> handlerMapToDB, cost:{}" + (l2 - l1));
 
-//
-//    final long headBlockNum = 2000 * 10000;
-//    System.out.println(" >>>>>>>>>>> headBlockNum" + headBlockNum);
-//
-//    l1 = System.currentTimeMillis();
-//    Map<String, Set<String>> tokenMap = new ConcurrentHashMap<>();
-//    handlerMap(headBlockNum, tokenMap);
-//    System.out.println(" >>> tokenMap.size:{}" + tokenMap.keySet().size());
-//
-//    final long sum = tokenMap.values().stream().mapToLong(item -> item.size()).sum();
-//    l2 = System.currentTimeMillis();
-//    System.out.println(" >>> tokenMap.size:{}" + sum + ", cost:" + (l2 - l1));
-//
-//    l1 = System.currentTimeMillis();
-//    handlerMapToDB(headBlockNum, tokenMap);
-//    l2 = System.currentTimeMillis();
-//    System.out.println(" >>> handlerMapToDB, cost:{}" + (l2 - l1));
-//
-//    final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
-//    syncDataToDB.syncDataToRedis(blockCapsule);
+    final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
+    syncDataToDB.syncDataToRedis(blockCapsule);
 
     System.out.println(" >>>>>>>>>>> main is end!!!!!!!!");
     System.exit(0);
