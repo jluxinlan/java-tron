@@ -109,8 +109,8 @@ public class FullNode {
     transactionRetStore = dbManager.getTransactionRetStore();
     transactionHistoryStore = dbManager.getTransactionHistoryStore();
 
-//    final long headBlockNum = dbManager.getHeadBlockNum();
-    final long headBlockNum = 2000 * 10000;
+    final long headBlockNum = dbManager.getHeadBlockNum();
+//    final long headBlockNum = 2000 * 10000;
     System.out.println(" >>>>>>>>>>> headBlockNum" + headBlockNum);
 
     l1 = System.currentTimeMillis();
@@ -134,7 +134,7 @@ public class FullNode {
     System.exit(0);
   }
 
-  private static final int batchSize = 100;
+  private static final int batchSize = 50;
   private static void handlerMapToDB(long headBlockNum, Map<String, Set<String>> tokenMap) {
     final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
     final AtomicInteger count = new AtomicInteger();
@@ -159,7 +159,7 @@ public class FullNode {
             syncDataToDB.saveAll(queue);
           }
 
-          if (count.incrementAndGet() % (10 * 10000) == 0) {
+          if (count.incrementAndGet() % (1 * 10000) == 0) {
             System.out.println(" >>> token:" + tokenAddress + ", dec:" + trc20Decimal + ", time:" + System.currentTimeMillis());
           }
         });
@@ -173,7 +173,7 @@ public class FullNode {
   }
 
   private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
-    LongStream.range(1950 * 10000, headBlockNum + 1).parallel().forEach(num -> {
+    LongStream.range(900 * 10000, headBlockNum + 1).parallel().forEach(num -> {
       parseTrc20Map(num, tokenMap);
 
       if (num % (10 * 10000) == 0) {
