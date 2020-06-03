@@ -176,6 +176,8 @@ public class FullNode {
         logger.error("", ex);
       }
     });
+
+    syncDataToDB.saveAll(queue);
   }
 
   private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
