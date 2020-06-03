@@ -117,7 +117,7 @@ public class SyncDataToDB {
         }
       });
 
-      preparedStatement.executeUpdate();
+      preparedStatement.executeBatch();
     }
     catch (Exception ex) {
       logger.error("", ex);
@@ -151,7 +151,7 @@ public class SyncDataToDB {
         }
       });
 
-      preparedStatement.executeUpdate();
+      preparedStatement.executeBatch();
     } catch (SQLException e) {
       logger.error("",  e);
     }

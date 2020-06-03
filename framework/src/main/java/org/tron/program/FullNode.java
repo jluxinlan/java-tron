@@ -7,7 +7,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.primitives.Bytes;
@@ -109,7 +108,8 @@ public class FullNode {
     transactionRetStore = dbManager.getTransactionRetStore();
     transactionHistoryStore = dbManager.getTransactionHistoryStore();
 
-    final long headBlockNum = dbManager.getHeadBlockNum();
+//    final long headBlockNum = dbManager.getHeadBlockNum();
+    final long headBlockNum = 2000 * 10000;
     System.out.println(" >>>>>>>>>>> headBlockNum" + headBlockNum);
 
     l1 = System.currentTimeMillis();
@@ -174,7 +174,7 @@ public class FullNode {
   private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
     long l1 = System.currentTimeMillis();
 
-    for (long num = 1000 * 10000; num <= headBlockNum; num++) {
+    for (long num = 1950 * 10000; num <= headBlockNum; num++) {
       parseTrc20Map(num, tokenMap);
 
       if (num % (10 * 10000) == 0) {
