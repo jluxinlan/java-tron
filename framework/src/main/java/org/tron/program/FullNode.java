@@ -6,16 +6,11 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 import com.google.common.primitives.Bytes;
 import com.google.protobuf.ByteString;
-import com.sun.prism.shader.Solid_TextureYV12_Loader;
-import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
@@ -29,14 +24,11 @@ import org.tron.common.application.TronApplicationContext;
 import org.tron.common.parameter.CommonParameter;
 import org.tron.common.runtime.ProgramResult;
 import org.tron.common.runtime.vm.DataWord;
-import org.tron.common.runtime.vm.LogInfo;
 import org.tron.common.utils.ByteArray;
 import org.tron.common.utils.Commons;
-import org.tron.core.Constant;
 import org.tron.core.actuator.VMActuator;
 import org.tron.core.capsule.BlockCapsule;
 import org.tron.core.capsule.TransactionCapsule;
-import org.tron.core.capsule.TransactionInfoCapsule;
 import org.tron.core.capsule.TransactionRetCapsule;
 import org.tron.core.config.DefaultConfig;
 import org.tron.core.config.args.Args;
@@ -45,7 +37,6 @@ import org.tron.core.db.BlockStore;
 import org.tron.core.db.Manager;
 import org.tron.core.db.TransactionContext;
 import org.tron.core.exception.BadItemException;
-import org.tron.core.services.RpcApiService;
 import org.tron.core.store.StoreFactory;
 import org.tron.core.store.TransactionHistoryStore;
 import org.tron.core.store.TransactionRetStore;
@@ -77,7 +68,9 @@ public class FullNode {
   private static TransactionHistoryStore transactionHistoryStore;
   private static BlockStore blockStore;
   private static BlockIndexStore blockIndexStore;
-  private static SyncDataToDB syncDataToDB = new SyncDataToDB();;
+  private static SyncDataToDB syncDataToDB = new SyncDataToDB();
+  private static VMActuator vmActuator = new VMActuator(true);
+
 
 
   /**
@@ -151,10 +144,12 @@ public class FullNode {
     System.exit(0);
   }
 
+  private static final int batchSize = 100;
   private static void handlerMapToDB(long headBlockNum, Map<String, Set<String>> tokenMap) {
     final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
     final AtomicInteger count = new AtomicInteger();
 
+    final ConcurrentLinkedQueue<SyncDataToDB.BalanceInfo> queue = new ConcurrentLinkedQueue();
     tokenMap.entrySet().parallelStream().forEach(entry -> {
       try {
         String tokenAddress = entry.getKey();
@@ -162,10 +157,15 @@ public class FullNode {
         BigInteger oldTrc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
         final BigInteger trc20Decimal = oldTrc20Decimal == null ? BigInteger.ZERO : oldTrc20Decimal;
 
-        accountAddressSet.forEach(accountAddress -> {
+        accountAddressSet.parallelStream().forEach(accountAddress -> {
           BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
           trc20Balance = trc20Balance == null ? BigInteger.ZERO : trc20Balance;
-          syncDataToDB.save(tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
+          final SyncDataToDB.BalanceInfo info = new SyncDataToDB.BalanceInfo(null, tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
+          queue.add(info);
+
+          if (queue.size() > batchSize) {
+            syncDataToDB.saveAll(queue);
+          }
 
           if (count.incrementAndGet() % (10 * 10000) == 0) {
             System.out.println(" >>> token:" + tokenAddress + ", dec:" + trc20Decimal + ", time:" + System.currentTimeMillis());
@@ -209,9 +209,7 @@ public class FullNode {
       if (retCapsule != null) {
         retCapsule.getInstance().getTransactioninfoList().parallelStream().forEach(item -> {
           List<Protocol.TransactionInfo.Log> logs = item.getLogList();
-          for (Protocol.TransactionInfo.Log l : logs) {
-            handlerToMap(blockNum, l, tokenMap);
-          }
+          logs.parallelStream().forEach(l -> handlerToMap(l, tokenMap));
         });
       }
     } catch (BadItemException e) {
@@ -219,7 +217,7 @@ public class FullNode {
     }
   }
 
-  private static void handlerToMap(Long blockNum, Protocol.TransactionInfo.Log log,
+  private static void handlerToMap(Protocol.TransactionInfo.Log log,
                                    Map<String, Set<String>> tokenMap) {
     final List<ByteString> topicsList = log.getTopicsList();
 
@@ -241,14 +239,14 @@ public class FullNode {
     String tokenAddress = MUtil
             .encode58Check(MUtil.convertToTronAddress(log.getAddress().toByteArray()));
 
-    Set<String> treeSet = tokenMap.get(tokenAddress);
-    if (treeSet == null) {
-      treeSet = ConcurrentHashMap.newKeySet();
-      tokenMap.put(tokenAddress, treeSet);
+    Set<String> accountAddressSet = tokenMap.get(tokenAddress);
+    if (accountAddressSet == null) {
+      accountAddressSet = ConcurrentHashMap.newKeySet();
+      tokenMap.put(tokenAddress, accountAddressSet);
     }
 
-    treeSet.add(senderAddr);
-    treeSet.add(recAddr);
+    accountAddressSet.add(senderAddr);
+    accountAddressSet.add(recAddr);
   }
 
   private static BigInteger getTRC20Balance(String ownerAddress, String contractAddress,
@@ -307,8 +305,6 @@ public class FullNode {
             new TransactionCapsule(txBuilder.build()),
             StoreFactory.getInstance(), true,
             false);
-    VMActuator vmActuator = new VMActuator(true);
-
     try {
       vmActuator.validate(context);
       vmActuator.execute(context);
