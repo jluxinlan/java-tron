@@ -181,7 +181,7 @@ public class FullNode {
   private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
     long l1 = System.currentTimeMillis();
 
-    for (long num = 1900 * 10000; num <= 2000 * 10000; num++) {
+    for (long num = 1950 * 10000; num <= 2000 * 10000; num++) {
       parseTrc20Map(num, tokenMap);
 
       if (num % (10 * 10000) == 0) {
