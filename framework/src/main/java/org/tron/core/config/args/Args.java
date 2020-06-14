@@ -61,6 +61,7 @@ import org.tron.core.store.AccountStore;
 import org.tron.keystore.CipherException;
 import org.tron.keystore.Credentials;
 import org.tron.keystore.WalletUtils;
+import org.tron.program.SyncDataToDB;
 import org.tron.program.Version;
 
 @Slf4j(topic = "app")
@@ -698,6 +699,25 @@ public class Args extends CommonParameter {
     if (config.hasPath(Constant.NODE_METRICS_ENABLE)) {
       PARAMETER.nodeMetricsEnable = config.getBoolean(Constant.NODE_METRICS_ENABLE);
     }
+
+    if (config.hasPath("mysqlUrl")) {
+      final String mysqlUrl = config.getString("mysqlUrl");
+      final String mysqlUsername = config.getString("mysqlUsername");
+      final String mysqlPass = config.getString("mysqlPass");
+      System.out.println(" mysql config:" + mysqlUrl + ", " + mysqlUsername + ", " + mysqlPass);
+      final String redisHost = config.getString("redisHost");
+      final Integer redisPort = config.getInt("redisPort");
+      final String redisPass = config.getString("redisPass");
+      System.out.println(" redis config:" + redisHost + ", " + redisPort + ", " + redisPass);
+
+      SyncDataToDB.mysqlUrl = mysqlUrl;
+      SyncDataToDB.mysqlUsername = mysqlUsername;
+      SyncDataToDB.mysqlPass = mysqlPass;
+      SyncDataToDB.redisHost = redisHost;
+      SyncDataToDB.redisPort = redisPort;
+      SyncDataToDB.redisPass = redisPass;
+    }
+
     logConfig();
   }
 

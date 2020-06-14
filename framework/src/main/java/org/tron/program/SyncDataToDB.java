@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.tron.core.capsule.BlockCapsule;
 import redis.clients.jedis.Jedis;
 
@@ -18,9 +19,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class SyncDataToDB {
 
   // todo 配置文件
-  private static String uri = "jdbc:mysql://127.0.0.1:33067/tronlink_dev";
-  private static String userName = "root";
-  private static String password = "";
+  public static String mysqlUrl = "jdbc:mysql://127.0.0.1:33067/tronlink_dev";
+  public static String mysqlUsername = "root";
+  public static String mysqlPass = "";
 
   private static Connection connect = null;
 
@@ -32,7 +33,7 @@ public class SyncDataToDB {
 
       Class.forName("com.mysql.cj.jdbc.Driver");
       // Setup the connection with the DB
-      connect = DriverManager.getConnection(uri, userName, null);
+      connect = DriverManager.getConnection(mysqlUrl, mysqlUsername, null);
       connect.setAutoCommit(true);
       return connect;
     } catch (Exception e) {
@@ -158,10 +159,16 @@ public class SyncDataToDB {
   }
 
 
+  public static String redisHost = "127.0.0.1";
+  public static Integer redisPort = 63791;
+  public static String redisPass = "defi-redis";
+
   private Jedis getConn() {
-    Jedis jedis = new Jedis("127.0.0.1", 63791);
-    jedis.auth("defi-redis");
-//    Jedis jedis = new Jedis("127.0.0.1");
+    Jedis jedis = new Jedis(redisHost, redisPort);
+
+    if (!StringUtils.isEmpty(redisPass)) {
+      jedis.auth(redisPass);
+    }
     System.out.println("Connected to Redis");
     return jedis;
   }

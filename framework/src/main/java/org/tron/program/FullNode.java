@@ -80,11 +80,11 @@ public class FullNode {
   public static void main(String[] args) {
     System.out.println(" >>>>>>>>>>> start");
 //    String dbPath = "/Users/tron/Downloads/output-directory";
-    String dbPath = "/data/mainnetdb/output-directory";
-    args = new String[] {"-d", dbPath};
-//    String conf = "/Users/tron/Downloads/main_net_config.conf";
-    String conf = "/home/java-tron/main_net_config.conf";
-    Args.setParam(args, conf);
+//    String dbPath = "/data/mainnetdb/output-directory";
+//    args = new String[] {"-d", dbPath};
+////    String conf = "/Users/tron/Downloads/main_net_config.conf";
+////    String conf = "/home/java-tron/main_net_config.conf";
+    Args.setParam(args, null);
     CommonParameter parameter = Args.getInstance();
 
     load(parameter.getLogbackPath());
@@ -115,7 +115,7 @@ public class FullNode {
 
     l1 = System.currentTimeMillis();
     Map<String, Set<String>> tokenMap = new ConcurrentHashMap<>();
-    handlerMap(headBlockNum, tokenMap);
+//    handlerMap(headBlockNum, tokenMap);
     System.out.println(" >>> tokenMap.size:{}" + tokenMap.keySet().size());
 
     final long sum = tokenMap.values().stream().mapToLong(item -> item.size()).sum();
@@ -123,12 +123,12 @@ public class FullNode {
     System.out.println(" >>> tokenMap.size:{}" + sum + ", cost:" + (l2 - l1));
 
     l1 = System.currentTimeMillis();
-    handlerMapToDB(headBlockNum, tokenMap);
+//    handlerMapToDB(headBlockNum, tokenMap);
     l2 = System.currentTimeMillis();
     System.out.println(" >>> handlerMapToDB, cost:{}" + (l2 - l1));
 
-    final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
-    syncDataToDB.syncDataToRedis(blockCapsule);
+//    final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
+//    syncDataToDB.syncDataToRedis(blockCapsule);
 
     System.out.println(" >>>>>>>>>>> main is end!!!!!!!!");
     System.exit(0);
@@ -274,7 +274,6 @@ public class FullNode {
 
   }
 
-  //todo 1844172 个要执行的数据， 效率需要提升
   private static ProgramResult triggerFromVM(String contractAddress, byte[] data,
                                              BlockCapsule baseBlockCap) {
     SmartContractOuterClass.TriggerSmartContract.Builder build = SmartContractOuterClass.TriggerSmartContract.newBuilder();
