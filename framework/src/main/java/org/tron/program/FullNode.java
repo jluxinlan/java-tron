@@ -72,6 +72,7 @@ public class FullNode {
   private static SyncDataToDB syncDataToDB = new SyncDataToDB();
   private static VMActuator vmActuator = new VMActuator(true);
 
+  private static String tokenAddress = "TQpEKTC5JBQCSv7BzDFMWHjwQDKcMTsfJX";
 
 
   /**
@@ -115,19 +116,21 @@ public class FullNode {
 
     l1 = System.currentTimeMillis();
     Map<String, Set<String>> tokenMap = new ConcurrentHashMap<>();
-//    handlerMap(headBlockNum, tokenMap);
+    handlerMap(headBlockNum, tokenMap);
     System.out.println(" >>> tokenMap.size:{}" + tokenMap.keySet().size());
 
     final long sum = tokenMap.values().stream().mapToLong(item -> item.size()).sum();
     l2 = System.currentTimeMillis();
     System.out.println(" >>> tokenMap.size:{}" + sum + ", cost:" + (l2 - l1));
 
+    System.out.println(" >>>>> containsKey:" + tokenMap.containsKey(tokenAddress));
+
     l1 = System.currentTimeMillis();
-//    handlerMapToDB(headBlockNum, tokenMap);
+    handlerMapToDB(headBlockNum, tokenMap);
     l2 = System.currentTimeMillis();
     System.out.println(" >>> handlerMapToDB, cost:{}" + (l2 - l1));
 
-//    final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
+    final BlockCapsule blockCapsule = getBlockByNum(headBlockNum);
 //    syncDataToDB.syncDataToRedis(blockCapsule);
 
     System.out.println(" >>>>>>>>>>> main is end!!!!!!!!");
@@ -144,6 +147,11 @@ public class FullNode {
     tokenMap.entrySet().stream().forEach(entry -> {
       try {
         String tokenAddress = entry.getKey();
+
+        if (!Objects.equals(tokenAddress, FullNode.tokenAddress)) {
+          return;
+        }
+
         final Set<String> accountAddressSet = entry.getValue();
         BigInteger oldTrc20Decimal = getTRC20Decimal(tokenAddress, blockCapsule);
         final BigInteger trc20Decimal = oldTrc20Decimal == null ? BigInteger.ZERO : oldTrc20Decimal;
@@ -153,14 +161,14 @@ public class FullNode {
           BigInteger trc20Balance = getTRC20Balance(accountAddress, tokenAddress, blockCapsule);
           trc20Balance = trc20Balance == null ? BigInteger.ZERO : trc20Balance;
           final SyncDataToDB.BalanceInfo info = new SyncDataToDB.BalanceInfo(null, tokenAddress, accountAddress, headBlockNum, trc20Balance, trc20Decimal.intValue());
-          queue.add(info);
+//          queue.add(info);
 
-          if (queue.size() > batchSize) {
-            syncDataToDB.saveAll(queue);
-          }
+//          if (queue.size() > batchSize) {
+//            syncDataToDB.saveAll(queue);
+//          }
 
           if (count.incrementAndGet() % (1 * 10000) == 0) {
-            System.out.println(" >>> token:" + tokenAddress + ", dec:" + trc20Decimal + ", time:" + System.currentTimeMillis());
+            System.out.println(" >>> token:" + tokenAddress + ", decimals:" + trc20Decimal + ", balance:" + trc20Balance + ", time:" + System.currentTimeMillis());
           }
         });
       }
@@ -169,11 +177,11 @@ public class FullNode {
       }
     });
 
-    syncDataToDB.saveAll(queue);
+//    syncDataToDB.saveAll(queue);
   }
 
   private static void handlerMap(long headBlockNum, Map<String, Set<String>> tokenMap) {
-    LongStream.range(900 * 10000, headBlockNum + 1).parallel().forEach(num -> {
+    LongStream.range(0, headBlockNum + 1).parallel().forEach(num -> {
       parseTrc20Map(num, tokenMap);
 
       if (num % (10 * 10000) == 0) {
