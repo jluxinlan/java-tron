@@ -4,7 +4,7 @@ plugins {
 
 apply plugin: 'application'
 apply plugin: 'checkstyle'
-apply plugin: 'com.github.johnrengelman.shadow'
+//apply plugin: 'com.github.johnrengelman.shadow'
 
 mainClassName = 'org.tron.program.FullNode'
 
