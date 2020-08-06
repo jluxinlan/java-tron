@@ -24,6 +24,7 @@ import com.google.protobuf.ByteString;
 import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,19 +110,6 @@ public class TransactionUtil {
       }
     }
     return true;
-  }
-
-  public static boolean isNumber(byte[] id) {
-    if (ArrayUtils.isEmpty(id)) {
-      return false;
-    }
-    for (byte b : id) {
-      if (b < '0' || b > '9') {
-        return false;
-      }
-    }
-
-    return !(id.length > 1 && id[0] == '0');
   }
 
   public static Sha256Hash getTransactionId(Transaction transaction) {
@@ -221,7 +209,7 @@ public class TransactionUtil {
       Contract contract = trx.getRawData().getContract(0);
       byte[] owner = TransactionCapsule.getOwner(contract);
       AccountCapsule account = chainBaseManager.getAccountStore().get(owner);
-      if (account == null) {
+      if (Objects.isNull(account)) {
         throw new PermissionException("Account does not exist!");
       }
       int permissionId = contract.getPermissionId();

@@ -4,11 +4,11 @@ import static org.tron.common.utils.StringUtil.encode58Check;
 
 import com.google.protobuf.ByteString;
 import java.util.Arrays;
-import org.tron.common.crypto.Hash;
-import org.tron.common.parameter.CommonParameter;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.tron.common.crypto.Hash;
+import org.tron.common.parameter.CommonParameter;
 import org.tron.core.capsule.ContractCapsule;
 import org.tron.core.capsule.TransactionCapsule;
 import org.tron.core.exception.ContractValidateException;
@@ -101,7 +101,7 @@ public class WalletUtil {
       byte[] funcSelector = new byte[4];
       System.arraycopy(Hash.sha3(sb.toString().getBytes()), 0, funcSelector, 0, 4);
       if (Arrays.equals(funcSelector, selector)) {
-        if (entry.getConstant() == true || entry.getStateMutability()
+        if (entry.getConstant() || entry.getStateMutability()
             .equals(StateMutabilityType.View)) {
           return true;
         } else {
@@ -115,8 +115,8 @@ public class WalletUtil {
 
   public static List<String> getAddressStringList(Collection<ByteString> collection) {
     return collection.stream()
-      .map(bytes -> encode58Check(bytes.toByteArray()))
-      .collect(Collectors.toList());
+        .map(bytes -> encode58Check(bytes.toByteArray()))
+        .collect(Collectors.toList());
   }
 
   public static byte[] getSelector(byte[] data) {

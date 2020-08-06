@@ -13,7 +13,6 @@ import org.tron.core.exception.ContractExeException;
 import org.tron.core.exception.ContractValidateException;
 import org.tron.core.exception.ReceiptCheckErrException;
 import org.tron.core.exception.VMIllegalException;
-import org.tron.core.utils.TransactionUtil;
 import org.tron.core.vm.config.ConfigLoader;
 import org.tron.core.vm.config.VMConfig;
 import org.tron.protos.Protocol.Transaction;
@@ -42,7 +41,7 @@ contract isTestCtr {
         }
     }
     function isTestEquals(address addr) view public returns (bool) {
-        if (addr.isContract == true) {
+        if (addr.isContract) {
             return true;
         } else {
             return false;

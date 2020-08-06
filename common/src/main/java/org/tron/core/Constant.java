@@ -1,8 +1,7 @@
 package org.tron.core;
 
-import org.tron.common.utils.ByteArray;
-
 public class Constant {
+
   //config for testnet, mainnet, beta
   public static final String TESTNET_CONF = "config.conf";
 
@@ -88,6 +87,7 @@ public class Constant {
   public static final String NODE_HTTP_SOLIDITY_PORT = "node.http.solidityPort";
   public static final String NODE_HTTP_FULLNODE_ENABLE = "node.http.fullNodeEnable";
   public static final String NODE_HTTP_SOLIDITY_ENABLE = "node.http.solidityEnable";
+  public static final String NODE_HTTP_STATISTICS_SR_REWARD_SWITCH = "node.http.statisticsSRRewardSwitch";
   public static final String NODE_HTTP_PBFT_PORT = "node.http.PBFTPort";
 
   public static final String NODE_RPC_THREAD = "node.rpc.thread";
@@ -152,6 +152,8 @@ public class Constant {
 
   public static final String NODE_MAX_TRANSACTION_PENDING_SIZE = "node.maxTransactionPendingSize";
 
+  public static final String NODE_PENDING_TRANSACTION_TIMEOUT = "node.pendingTransactionTimeout";
+
   public static final String STORAGE_NEEDTO_UPDATE_ASSET = "storage.needToUpdateAsset";
 
   public static final String TRX_REFERENCE_BLOCK = "trx.reference.block";
@@ -166,13 +168,20 @@ public class Constant {
 
   public static final String VM_SAVE_INTERNAL_TX = "vm.saveInternalTx";
 
-  public static final String COMMITTEE_ALLOW_SHIELDED_TRANSACTION = "committee.allowShieldedTransaction";
+  // public static final String COMMITTEE_ALLOW_SHIELDED_TRANSACTION = "committee.allowShieldedTransaction";
+
+  public static final String COMMITTEE_ALLOW_SHIELDED_TRC20_TRANSACTION = "committee"
+      + ".allowShieldedTRC20Transaction";
+
+  public static final String COMMITTEE_ALLOW_MARKET_TRANSACTION =
+      "committee.allowMarketTransaction";
 
   public static final String EVENT_SUBSCRIBE = "event.subscribe";
 
   public static final String EVENT_SUBSCRIBE_FILTER = "event.subscribe.filter";
 
-  public static final String NODE_FULLNODE_ALLOW_SHIELDED_TRANSACTION = "node.fullNodeAllowShieldedTransaction";
+  public static final String NODE_FULLNODE_ALLOW_SHIELDED_TRANSACTION = "node"
+      + ".fullNodeAllowShieldedTransaction";
 
   public static final String NODE_ZEN_TOKENID = "node.zenTokenId";
 
@@ -238,4 +247,5 @@ public class Constant {
   public static final String SEED_NODE_IP_LIST = "seed.node.ip.list";
   public static final String NODE_METRICS_ENABLE = "node.metricsEnable";
   public static final String COMMITTEE_ALLOW_PBFT = "committee.allowPBFT";
+  public static final String NODE_AGREE_NODE_COUNT = "node.agreeNodeCount";
 }

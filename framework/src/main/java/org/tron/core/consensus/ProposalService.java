@@ -118,7 +118,8 @@ public class ProposalService extends ProposalUtil {
         case ALLOW_ADAPTIVE_ENERGY: {
           if (manager.getDynamicPropertiesStore().getAllowAdaptiveEnergy() == 0) {
             manager.getDynamicPropertiesStore().saveAllowAdaptiveEnergy(entry.getValue());
-            if (manager.getForkController().pass(ForkBlockVersionEnum.VERSION_3_6_5)) {
+            if (manager.getChainBaseManager()
+                .getForkController().pass(ForkBlockVersionEnum.VERSION_3_6_5)) {
               //24 * 60 * 2 . one minute,1/2 total limit.
               manager.getDynamicPropertiesStore().saveAdaptiveResourceLimitTargetRatio(2880);
               manager.getDynamicPropertiesStore().saveTotalEnergyTargetLimit(
@@ -197,6 +198,27 @@ public class ProposalService extends ProposalUtil {
           manager.getDynamicPropertiesStore().saveAllowPBFT(entry.getValue());
           break;
         }
+        case ALLOW_SHIELDED_TRC20_TRANSACTION: {
+          manager.getDynamicPropertiesStore().saveAllowShieldedTRC20Transaction(entry.getValue());
+          break;
+        }
+        case ALLOW_MARKET_TRANSACTION: {
+          if (manager.getDynamicPropertiesStore().getAllowMarketTransaction() == 0) {
+            manager.getDynamicPropertiesStore().saveAllowMarketTransaction(entry.getValue());
+            manager.getDynamicPropertiesStore().addSystemContractAndSetPermission(52);
+            manager.getDynamicPropertiesStore().addSystemContractAndSetPermission(53);
+          }
+          break;
+        }
+        case MARKET_SELL_FEE: {
+          manager.getDynamicPropertiesStore().saveMarketSellFee(entry.getValue());
+          break;
+        }
+        case MARKET_CANCEL_FEE: {
+          manager.getDynamicPropertiesStore().saveMarketCancelFee(entry.getValue());
+          break;
+        }
+
         default:
           find = false;
           break;

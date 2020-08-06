@@ -76,6 +76,7 @@ public class DBConvert {
       return;
     }
     File[] files = dbDirectory.listFiles();
+
     if (files == null || files.length == 0) {
       System.out.println(dbSrc + "does not contain any database.");
       return;
@@ -108,7 +109,7 @@ public class DBConvert {
   }
 
   public DB newLevelDb(Path db) throws IOException {
-    DB database = null;
+    DB database;
     File file = db.toFile();
     org.iq80.leveldb.Options dbOptions = newDefaultLevelDbOptions();
     try {

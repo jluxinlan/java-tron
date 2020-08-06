@@ -42,7 +42,6 @@ import org.tron.common.crypto.SignInterface;
 import org.tron.common.logsfilter.EventPluginConfig;
 import org.tron.common.logsfilter.FilterQuery;
 import org.tron.common.logsfilter.TriggerConfig;
-import org.tron.common.logsfilter.capsule.ContractTriggerCapsule;
 import org.tron.common.logsfilter.trigger.ContractEventTrigger;
 import org.tron.common.logsfilter.trigger.ContractLogTrigger;
 import org.tron.common.overlay.discover.node.Node;
@@ -75,12 +74,12 @@ public class Args extends CommonParameter {
   @Autowired(required = false)
   @Getter
   private static ConcurrentHashMap<Long, List<ContractLogTrigger>>
-      solidityContractLogTriggerList =  new ConcurrentHashMap<>();
+      solidityContractLogTriggerMap = new ConcurrentHashMap<>();
 
   @Autowired(required = false)
   @Getter
   private static ConcurrentHashMap<Long, List<ContractEventTrigger>>
-      solidityContractEventTriggerList =  new ConcurrentHashMap<>();
+      solidityContractEventTriggerMap = new ConcurrentHashMap<>();
 
   public static void clearParam() {
     PARAMETER.outputDirectory = "output-directory";
@@ -156,7 +155,7 @@ public class Args extends CommonParameter {
     PARAMETER.minTimeRatio = 0.0;
     PARAMETER.maxTimeRatio = 5.0;
     PARAMETER.longRunningTime = 10;
-    PARAMETER.allowShieldedTransaction = 0;
+    // PARAMETER.allowShieldedTransaction = 0;
     PARAMETER.maxHttpConnectNumber = 50;
     PARAMETER.allowMultiSign = 0;
     PARAMETER.trxExpirationTimeInMilliseconds = 0;
@@ -172,6 +171,8 @@ public class Args extends CommonParameter {
     PARAMETER.nodeMetricsEnable = true;
     PARAMETER.agreeNodeCount = MAX_ACTIVE_WITNESS_NUM * 2 / 3 + 1;
     PARAMETER.allowPBFT = 0;
+    PARAMETER.allowShieldedTRC20Transaction = 0;
+    PARAMETER.allowMarketTransaction = 0;
   }
 
   /**
@@ -217,10 +218,6 @@ public class Args extends CommonParameter {
     } else if (config.hasPath(Constant.LOCAL_WITNESS)) {
       localWitnesses = new LocalWitnesses();
       List<String> localwitness = config.getStringList(Constant.LOCAL_WITNESS);
-      if (localwitness.size() > 1) {
-        logger.warn("localwitness size must be one, get the first one");
-        localwitness = localwitness.subList(0, 1);
-      }
       localWitnesses.setPrivateKeys(localwitness);
 
       if (config.hasPath(Constant.LOCAL_WITNESS_ACCOUNT_ADDRESS)) {
@@ -295,6 +292,11 @@ public class Args extends CommonParameter {
 
     if (config.hasPath(Constant.NODE_HTTP_SOLIDITY_ENABLE)) {
       PARAMETER.solidityNodeHttpEnable = config.getBoolean(Constant.NODE_HTTP_SOLIDITY_ENABLE);
+    }
+
+    if (config.hasPath(Constant.NODE_HTTP_STATISTICS_SR_REWARD_SWITCH)) {
+      PARAMETER.nodeHttpStatisticsSRRewardEnable = config
+          .getBoolean(Constant.NODE_HTTP_STATISTICS_SR_REWARD_SWITCH);
     }
 
     if (config.hasPath(Constant.VM_MIN_TIME_RATIO)) {
@@ -593,6 +595,10 @@ public class Args extends CommonParameter {
         && config.getBoolean(Constant.NODE_IS_OPEN_FULL_TCP_DISCONNECT);
     PARAMETER.maxTransactionPendingSize = config.hasPath(Constant.NODE_MAX_TRANSACTION_PENDING_SIZE)
         ? config.getInt(Constant.NODE_MAX_TRANSACTION_PENDING_SIZE) : 2000;
+
+    PARAMETER.pendingTransactionTimeout = config.hasPath(Constant.NODE_PENDING_TRANSACTION_TIMEOUT)
+        ? config.getLong(Constant.NODE_PENDING_TRANSACTION_TIMEOUT) : 60_000;
+
     PARAMETER.needToUpdateAsset =
         config.hasPath(Constant.STORAGE_NEEDTO_UPDATE_ASSET) ? config
             .getBoolean(Constant.STORAGE_NEEDTO_UPDATE_ASSET)
@@ -609,7 +615,7 @@ public class Args extends CommonParameter {
     PARAMETER.minEffectiveConnection = config.hasPath(Constant.NODE_RPC_MIN_EFFECTIVE_CONNECTION)
         ? config.getInt(Constant.NODE_RPC_MIN_EFFECTIVE_CONNECTION) : 1;
 
-    PARAMETER.blockNumForEneryLimit = config.hasPath(Constant.ENERGY_LIMIT_BLOCK_NUM)
+    PARAMETER.blockNumForEnergyLimit = config.hasPath(Constant.ENERGY_LIMIT_BLOCK_NUM)
         ? config.getInt(Constant.ENERGY_LIMIT_BLOCK_NUM) : 4727890L;
 
     PARAMETER.vmTrace =
@@ -619,9 +625,17 @@ public class Args extends CommonParameter {
         config.hasPath(Constant.VM_SAVE_INTERNAL_TX)
             && config.getBoolean(Constant.VM_SAVE_INTERNAL_TX);
 
-    PARAMETER.allowShieldedTransaction =
-        config.hasPath(Constant.COMMITTEE_ALLOW_SHIELDED_TRANSACTION) ? config
-            .getInt(Constant.COMMITTEE_ALLOW_SHIELDED_TRANSACTION) : 0;
+    // PARAMETER.allowShieldedTransaction =
+    //     config.hasPath(Constant.COMMITTEE_ALLOW_SHIELDED_TRANSACTION) ? config
+    //         .getInt(Constant.COMMITTEE_ALLOW_SHIELDED_TRANSACTION) : 0;
+
+    PARAMETER.allowShieldedTRC20Transaction =
+        config.hasPath(Constant.COMMITTEE_ALLOW_SHIELDED_TRC20_TRANSACTION) ? config
+            .getInt(Constant.COMMITTEE_ALLOW_SHIELDED_TRC20_TRANSACTION) : 0;
+
+    PARAMETER.allowMarketTransaction =
+        config.hasPath(Constant.COMMITTEE_ALLOW_MARKET_TRANSACTION) ? config
+            .getInt(Constant.COMMITTEE_ALLOW_MARKET_TRANSACTION) : 0;
 
     PARAMETER.eventPluginConfig =
         config.hasPath(Constant.EVENT_SUBSCRIBE)
@@ -675,12 +689,12 @@ public class Args extends CommonParameter {
         config.hasPath(Constant.COMMITTEE_ALLOW_PBFT) ? config
             .getLong(Constant.COMMITTEE_ALLOW_PBFT) : 0;
 
-    PARAMETER.agreeNodeCount = config.hasPath("node.agreeNodeCount") ? config
-        .getInt("node.agreeNodeCount") : MAX_ACTIVE_WITNESS_NUM * 2 / 3 + 1;
+    PARAMETER.agreeNodeCount = config.hasPath(Constant.NODE_AGREE_NODE_COUNT) ? config
+        .getInt(Constant.NODE_AGREE_NODE_COUNT) : MAX_ACTIVE_WITNESS_NUM * 2 / 3 + 1;
     PARAMETER.agreeNodeCount = PARAMETER.agreeNodeCount > MAX_ACTIVE_WITNESS_NUM
         ? MAX_ACTIVE_WITNESS_NUM : PARAMETER.agreeNodeCount;
     if (PARAMETER.isWitness()) {
-    //  INSTANCE.agreeNodeCount = MAX_ACTIVE_WITNESS_NUM * 2 / 3 + 1;
+      //  INSTANCE.agreeNodeCount = MAX_ACTIVE_WITNESS_NUM * 2 / 3 + 1;
     }
 
     initBackupProperty(config);
@@ -1022,7 +1036,6 @@ public class Args extends CommonParameter {
     logger.info("Backup member size: {}", parameter.getBackupMembers().size());
     logger.info("************************ Code version *************************");
     logger.info("Code version : {}", Version.getVersion());
-    logger.info("Version name: {}", Version.versionName);
     logger.info("Version code: {}", Version.versionCode);
     logger.info("************************ DB config *************************");
     logger.info("DB version : {}", parameter.getStorage().getDbVersion());
